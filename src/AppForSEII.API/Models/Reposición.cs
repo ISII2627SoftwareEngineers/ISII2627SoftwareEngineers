@@ -9,7 +9,7 @@ public class Reposición
     public override bool Equals(object? obj)
     {
         if (obj is not Reposiciousing System.ComponentModel.DataAnnotations;
-        
+
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AppForSEII.API.Models;
@@ -75,4 +75,5 @@ public class Reposicion
     {
         return Id.GetHashCode();
     }
+    public DbSet<Reposicion> Reposiciones { get; set; }
 }

@@ -1,0 +1,6 @@
+@startuml
+class Editorial {
+    + Id : int <<get>> <<set>>
+    + Nombre : string <<get>> <<set>>
+}
+@enduml

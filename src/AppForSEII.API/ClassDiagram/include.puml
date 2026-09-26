@@ -1,4 +1,5 @@
 @startuml
 !include .\\ApplicationUser.puml
 !include .\\Libro.puml
+!include .\\Editorial.puml
 @enduml

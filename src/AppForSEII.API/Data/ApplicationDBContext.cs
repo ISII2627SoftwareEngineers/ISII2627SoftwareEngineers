@@ -19,6 +19,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
     public DbSet<Libro> Libros { get; set; }
+    public DbSet<Editorial> Editoriales { get; set; }//pongo ese comando para dar constancia al programa de que voy a hacer una tabla de la base de datos
+
 
 
 }

@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 namespace AppForSEII.API.Models;
 
 [Table("Reposiciones")]
-public class reposicion
+public class Reposicion
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -19,13 +19,13 @@ public class reposicion
     [StringLength(500, ErrorMessage = "El comentario no puede superar los 500 caracteres.")]
     public string? Comentario { get; set; }
 
-    public reposicion()
+    public Reposicion()
     {
     }
 
     public override bool Equals(object? obj)
     {
-        if (obj is not reposicion other)
+        if (obj is not Reposicion other)
             return false;
 
         return Id == other.Id;

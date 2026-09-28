@@ -1,0 +1,8 @@
+@startuml
+class Compra {
+    + Id : int <<get>> <<set>>
+    + FechaCompra : DateTime <<get>> <<set>>
+    + PrecioTotal : double <<get>> <<set>>
+    + CodigoDescuento : string <<get>> <<set>>
+}
+@enduml

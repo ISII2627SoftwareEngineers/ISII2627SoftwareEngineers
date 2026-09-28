@@ -5,6 +5,6 @@ class Libro {
     + TipoLibro : string <<get>> <<set>>
     + Autor : string <<get>> <<set>>
     + CalificacionMedia : double <<get>> <<set>>
-    + FechaLanzamiento : DateTime <<get>> <<set>>
 }
+Libro --> "FechaLanzamiento" DateTime
 @enduml

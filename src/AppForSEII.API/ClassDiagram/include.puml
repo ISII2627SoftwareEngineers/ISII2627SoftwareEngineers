@@ -7,4 +7,5 @@
 !include .\\MetodoPago.puml
 !include .\\reposicion.puml
 !include .\\Resena.puml
+!include .\\ResenaItem.puml
 @enduml

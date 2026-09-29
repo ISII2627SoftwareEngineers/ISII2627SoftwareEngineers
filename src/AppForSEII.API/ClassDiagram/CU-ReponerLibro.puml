@@ -3,4 +3,5 @@ hide methods
 !include Libro.puml
 !include Reposicion.puml
 !include MetodoPago.puml
+!include Genero.puml
 @enduml

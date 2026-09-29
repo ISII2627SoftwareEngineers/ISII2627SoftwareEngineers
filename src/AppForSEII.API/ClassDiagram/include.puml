@@ -4,6 +4,7 @@
 !include .\\Editorial.puml
 !include .\\Genero.puml
 !include .\\Libro.puml
+!include .\\MetodoPago.puml
 !include .\\reposicion.puml
 !include .\\Resena.puml
 @enduml

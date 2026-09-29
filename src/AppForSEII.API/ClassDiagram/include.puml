@@ -6,4 +6,5 @@
 !include .\\Libro.puml
 !include .\\reposicion.puml
 !include .\\Resena.puml
+!include .\\ResenaItem.puml
 @enduml

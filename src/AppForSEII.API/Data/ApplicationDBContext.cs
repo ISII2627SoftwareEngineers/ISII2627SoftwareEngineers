@@ -30,4 +30,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<ReposicionItem> ReposicionItems { get; set; }
 
     public DbSet<CompraItem> CompraItems { get; set; }
+
+    public DbSet<GooglePay> GooglePays { get; set; }
 }

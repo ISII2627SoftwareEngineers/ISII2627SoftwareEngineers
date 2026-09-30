@@ -4,4 +4,5 @@ hide methods
 !include Reposicion.puml
 !include MetodoPago.puml
 !include Genero.puml
+!include ReposicionItem.puml
 @enduml

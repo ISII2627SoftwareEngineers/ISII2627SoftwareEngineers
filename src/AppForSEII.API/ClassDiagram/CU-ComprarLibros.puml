@@ -4,4 +4,7 @@ hide methods
 !include Libro.puml
 !include Compra.puml
 !include CompraItem.puml
+!include MetodoPago.puml
+!include Visa.puml
+!include GooglePay.puml
 @enduml

@@ -13,5 +13,8 @@ namespace AppForSEII.API.Models
 
         [Required]
         public DateTime FechaResena { get; set; }
+
+        public ApplicationUser Usuario { get; set; }
+        public IList<ResenaItem> ResenaItems { get; set; }
     }
 }

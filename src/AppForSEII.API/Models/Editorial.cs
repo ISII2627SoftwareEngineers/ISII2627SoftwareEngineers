@@ -19,5 +19,6 @@ namespace AppForSEII.API.Models
         [Required] //Para decir que Nombre es un campo obligatorio de rellenar(no puede ser NULL)
         [StringLength(50)] //Para decir que Nombre tiene un máximo de 50 caracteres
         public string Nombre { get; set; } //Nombre de la editorial
+        public IList<Libro> Libros { get; set; }
     }
 }

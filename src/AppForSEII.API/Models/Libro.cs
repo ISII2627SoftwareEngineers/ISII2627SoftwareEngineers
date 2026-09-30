@@ -18,5 +18,9 @@ namespace AppForSEII.API.Models
         public double CalificacionMedia { get; set; }
 
         public DateTime FechaLanzamiento { get; set; }
+
+        public IList<ResenaItem> ResenaItems { get; set; }
+        public Genero Genero { get; set; }
+        public Editorial Editorial { get; set; }
     }
 }

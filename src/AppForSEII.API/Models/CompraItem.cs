@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AppForSEII.API.Models
 {
+    [PrimaryKey(nameof(LibroId), nameof(CompraId))] // Clave compuesta
     public class CompraItem
     {
 

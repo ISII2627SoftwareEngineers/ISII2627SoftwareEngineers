@@ -7,6 +7,7 @@
 !include .\\GooglePay.puml
 !include .\\Libro.puml
 !include .\\MetodoPago.puml
+!include .\\Paypal.puml
 !include .\\reposicion.puml
 !include .\\ReposicionItem.puml
 !include .\\Resena.puml

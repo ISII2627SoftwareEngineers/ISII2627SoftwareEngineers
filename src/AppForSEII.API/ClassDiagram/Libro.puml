@@ -6,5 +6,8 @@ class Libro {
     + Autor : string <<get>> <<set>>
     + CalificacionMedia : double <<get>> <<set>>
     + FechaLanzamiento : DateTime <<get>> <<set>>
+    + ResenaItems : IList<ResenaItem> <<get>> <<set>>
+    + Genero : Genero <<get>> <<set>>
+    + Editorial : Editorial <<get>> <<set>>
 }
 @enduml

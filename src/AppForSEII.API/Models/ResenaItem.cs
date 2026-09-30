@@ -14,7 +14,9 @@ namespace AppForSEII.API.Models
         public string? Descripcion { get; set; }
 
         public int LibroId { get; set; }
+        public Libro Libro { get; set; }
 
         public int ResenaId { get; set; }
+        public Resena Resena { get; set; }
     }
 }

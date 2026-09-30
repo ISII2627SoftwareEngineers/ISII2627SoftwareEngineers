@@ -3,5 +3,7 @@ class Resena {
     + Id : int <<get>> <<set>>
     + Titulo : string <<get>> <<set>>
     + FechaResena : DateTime <<get>> <<set>>
+    + Usuario : ApplicationUser <<get>> <<set>>
+    + ResenaItems : IList<ResenaItem> <<get>> <<set>>
 }
 @enduml

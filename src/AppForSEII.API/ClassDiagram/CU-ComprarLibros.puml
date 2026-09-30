@@ -3,4 +3,5 @@ hide methods
 !include Editorial.puml
 !include Libro.puml
 !include Compra.puml
+!include CompraItem.puml
 @enduml

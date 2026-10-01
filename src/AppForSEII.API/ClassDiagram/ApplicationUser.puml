@@ -1,12 +1,9 @@
 @startuml
 class ApplicationUser {
     + ApplicationUser()
-    + ApplicationUser(nombre:string?, apellidos:string?, direccion:string?, telefono:string?, resenas:IList<Resena>, compras:IList<Compra>, reposiciones:IList<Reposicion>)
-    - Id : int <<get>> <<set>>
-    + Nombre : string? <<get>> <<set>>
-    + Apellidos : string? <<get>> <<set>>
-    + Direccion : string? <<get>> <<set>>
-    + Telefono : string? <<get>> <<set>>
+    + ApplicationUser(name:string?, surname:string?, resenas:IList<Resena>, compras:IList<Compra>, reposiciones:IList<Reposicion>)
+    + Name : string? <<get>> <<set>>
+    + Surname : string? <<get>> <<set>>
     + Resenas : IList<Resena> <<get>> <<set>>
     + Compras : IList<Compra> <<get>> <<set>>
     + Reposiciones : IList<Reposicion> <<get>> <<set>>

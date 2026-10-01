@@ -19,6 +19,7 @@ namespace AppForSEII.API.Models
 
         public DateTime FechaLanzamiento { get; set; }
 
+        public IList<CompraItem> CompraItems { get; set; } // Relación 1 a N con CompraItem
         public IList<ResenaItem> ResenaItems { get; set; }
         public Genero Genero { get; set; }
         public Editorial Editorial { get; set; }

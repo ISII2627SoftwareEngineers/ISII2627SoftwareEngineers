@@ -4,6 +4,23 @@ namespace AppForSEII.API.Models;
 [Table("Reposiciones")]
 public class Reposicion
 {
+public Reposicion()
+    {
+        ReposicionItems = new List<ReposicionItem>();
+        MetodosPago = new List<MetodoPago>();
+    }
+
+    public Reposicion(int id, DateTime fechaReposicion, decimal precioTotal, string? comentario, IList<ReposicionItem> reposicionItems, IList<MetodoPago> metodosPago, ApplicationUser usuario)
+    {
+        Id = id;
+        FechaReposicion = fechaReposicion;
+        PrecioTotal = precioTotal;
+        Comentario = comentario;
+        ReposicionItems = reposicionItems ?? new List<ReposicionItem>();
+        MetodosPago = metodosPago ?? new List<MetodoPago>();
+        Usuario = usuario;
+    }
+
     [Key]
     public int Id { get; set; }
 
@@ -22,9 +39,6 @@ public class Reposicion
     public IList<MetodoPago> MetodosPago {get; set;}
 
     public ApplicationUser Usuario{ get; set;}
-    public Reposicion()
-    {
-    }
 
     public override bool Equals(object? obj)
     {

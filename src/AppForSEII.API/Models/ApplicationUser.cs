@@ -5,23 +5,33 @@ namespace AppForSEII.API.Models;
 // Add profile data for application users by adding properties to the ApplicationUser class
 public class ApplicationUser : IdentityUser
 {
-    public ApplicationUser()
+  public ApplicationUser()
     {
-    }
-    public ApplicationUser(string id, string name, string surname, string userName)
-    {
-        Id = id;
-        Name = name;
-        Surname = surname;
-        UserName = userName;
-        Email = userName;
+        Resenas = new List<Resena>(); //Inicializo las listas para evitar errores de referencia nula al acceder a ellas
+        Compras = new List<Compra>();
+        Reposiciones = new List<Reposicion>();
     }
 
-    [StringLength(50)]
-    public string? Name {get;set;}
+    public ApplicationUser(string? nombre, string? apellidos, string? direccion, string? telefono, IList<Resena> resenas, IList<Compra> compras, IList<Reposicion> reposiciones)
+    {
+        Nombre = nombre;
+        Apellidos = apellidos;
+        Direccion = direccion;
+        Telefono = telefono;
+        Resenas = resenas ?? new List<Resena>();
+        Compras = compras ?? new List<Compra>();
+        Reposiciones = reposiciones ?? new List<Reposicion>();
+    }
+
+    int Id {get;set;}
 
     [StringLength(50)]
-    public string? Surname {get;set;}
+    public string? Nombre {get;set;}
+
+    [StringLength(50)]
+    public string? Apellidos {get;set;}
+    public string? Direccion {get;set;}
+    public string? Telefono {get;set;}
     public IList<Resena> Resenas { get; set; }
 
     public IList<Compra> Compras { get; set; } // Relacion 1 a N con Compra

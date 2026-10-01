@@ -4,6 +4,18 @@ namespace AppForSEII.API.Models
 {
     public class Genero
     {
+        public Genero()
+        {
+            Libros = new List<Libro>();
+        }
+
+        public Genero(int id, string nombre, IList<Libro> libros)
+        {
+            Id = id;
+            Nombre = nombre;
+            Libros = libros ?? new List<Libro>();
+        }
+
         [Key]
         public int Id { get; set; }
 

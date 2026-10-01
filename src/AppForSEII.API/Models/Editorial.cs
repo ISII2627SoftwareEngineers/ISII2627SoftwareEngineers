@@ -4,6 +4,18 @@ namespace AppForSEII.API.Models
 {
     public class Editorial
     {
+        public Editorial()
+        {
+            Libros = new List<Libro>();
+        }
+
+        public Editorial(int id, string nombre, IList<Libro> libros)
+        {
+            Id = id;
+            Nombre = nombre;
+            Libros = libros ?? new List<Libro>();
+        }
+
         /*
         lo que hay entre corchetes es solo para 
         indicarle a la base de datos que restricciones 

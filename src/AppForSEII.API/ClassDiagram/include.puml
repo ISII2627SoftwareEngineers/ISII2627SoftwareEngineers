@@ -8,7 +8,7 @@
 !include .\\Libro.puml
 !include .\\MetodoPago.puml
 !include .\\Paypal.puml
-!include .\\reposicion.puml
+!include .\\Reposicion.puml
 !include .\\ReposicionItem.puml
 !include .\\Resena.puml
 !include .\\ResenaItem.puml

@@ -6,10 +6,4 @@ hide methods
 !include Resena.puml
 !include ResenaItem.puml
 !include ApplicationUser.puml
-
-Genero -- "0..* Libros" "Libro"
-Editorial -- "0..* Libros" "Libro"
-ApplicationUser -- "0..* Resenas" "Resena"
-Libro o-- "0..* ResenaItems" "ResenaItem"
-Resena o-- "0..* ResenaItems" "ResenaItem"
 @enduml

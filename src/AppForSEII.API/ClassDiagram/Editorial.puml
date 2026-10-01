@@ -1,7 +1,10 @@
 @startuml
 class Editorial {
+    + Editorial()
+    + Editorial(id:int, nombre:string, libros:IList<Libro>)
     + Id : int <<get>> <<set>>
     + Nombre : string <<get>> <<set>>
     + Libros : IList<Libro> <<get>> <<set>>
 }
+Editorial "1" -- "0..* Libros" Libro
 @enduml

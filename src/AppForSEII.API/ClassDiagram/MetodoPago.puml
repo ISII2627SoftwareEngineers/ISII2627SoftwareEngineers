@@ -1,5 +1,9 @@
 @startuml
 class MetodoPago {
+    + MetodoPago()
+    + MetodoPago(id:int, reposicion:Reposicion, compras:IList<Compra>)
     + Id : int <<get>> <<set>>
+    + Reposicion : Reposicion <<get>> <<set>>
+    + Compras : IList<Compra> <<get>> <<set>>
 }
 @enduml

@@ -23,4 +23,6 @@ public class ApplicationUser : IdentityUser
     [StringLength(50)]
     public string? Surname {get;set;}
     public IList<Resena> Resenas { get; set; }
+
+    public IList<Compra> Compras { get; set; } // Relación 1 a N con Compra
 }

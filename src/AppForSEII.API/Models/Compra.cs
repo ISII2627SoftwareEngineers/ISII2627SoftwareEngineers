@@ -22,5 +22,6 @@ namespace AppForSEII.API.Models
 
         public IList<CompraItem> CompraItems { get; set; }// Relacion 1 a N con CompraItem
 
+        public ApplicationUser Usuario { get; set; }
     }
 }

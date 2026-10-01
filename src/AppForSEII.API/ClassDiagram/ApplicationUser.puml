@@ -5,6 +5,9 @@ class ApplicationUser {
     + Name : string? <<get>> <<set>>
     + Surname : string? <<get>> <<set>>
     + Resenas : IList<Resena> <<get>> <<set>>
+    + Compras : IList<Compra> <<get>> <<set>>
+    + Reposiciones : IList<Reposicion> <<get>> <<set>>
 }
+ApplicationUser "1" -- "0..* Resenas" Resena
 IdentityUser <|-- ApplicationUser
 @enduml

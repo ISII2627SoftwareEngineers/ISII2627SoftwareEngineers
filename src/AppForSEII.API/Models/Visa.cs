@@ -5,6 +5,16 @@ namespace AppForSEII.API.Models
 {
     public class Visa:MetodoPago
     {
+        public Visa()
+        {
+        }
+
+        public Visa(int numeroTarjeta, DateTime fechaCaducidad)
+        {
+            NumeroTarjeta = numeroTarjeta;
+            FechaCaducidad = fechaCaducidad;
+        }
+
         [Required]
         public int NumeroTarjeta { get; set; }
 
@@ -12,7 +22,6 @@ namespace AppForSEII.API.Models
         [Required]
         public DateTime FechaCaducidad { get; set; }
 
-        public Visa(){}
 
     }
 }

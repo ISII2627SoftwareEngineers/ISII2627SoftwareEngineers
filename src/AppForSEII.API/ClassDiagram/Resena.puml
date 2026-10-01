@@ -1,9 +1,12 @@
 @startuml
 class Resena {
+    + Resena()
+    + Resena(id:int, titulo:string, fechaResena:DateTime, usuario:ApplicationUser, resenaItems:IList<ResenaItem>)
     + Id : int <<get>> <<set>>
     + Titulo : string <<get>> <<set>>
     + FechaResena : DateTime <<get>> <<set>>
     + Usuario : ApplicationUser <<get>> <<set>>
     + ResenaItems : IList<ResenaItem> <<get>> <<set>>
 }
+Resena "1" o-- "0..* ResenaItems" ResenaItem
 @enduml

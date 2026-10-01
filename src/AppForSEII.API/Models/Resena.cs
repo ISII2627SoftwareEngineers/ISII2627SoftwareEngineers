@@ -5,6 +5,20 @@ namespace AppForSEII.API.Models
 {
     public class Resena
     {
+        public Resena()
+        {
+            ResenaItems = new List<ResenaItem>();
+        }
+
+        public Resena(int id, string titulo, DateTime fechaResena, ApplicationUser usuario, IList<ResenaItem> resenaItems)
+        {
+            Id = id;
+            Titulo = titulo;
+            FechaResena = fechaResena;
+            Usuario = usuario;
+            ResenaItems = resenaItems ?? new List<ResenaItem>();
+        }
+
         public int Id { get; set; }
 
         [Required]

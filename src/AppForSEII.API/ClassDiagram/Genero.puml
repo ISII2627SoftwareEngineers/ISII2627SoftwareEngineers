@@ -1,7 +1,10 @@
 @startuml
 class Genero {
+    + Genero()
+    + Genero(id:int, nombre:string, libros:IList<Libro>)
     + Id : int <<get>> <<set>>
     + Nombre : string <<get>> <<set>>
     + Libros : IList<Libro> <<get>> <<set>>
 }
+Genero "1" -- "0..* Libros" Libro
 @enduml

@@ -1,12 +1,16 @@
 @startuml
 class Libro {
+    + Libro()
+    + Libro(id:int, titulo:string, tipoLibro:string, autor:string, calificacionMedia:double, fechaLanzamiento:DateTime, compraItems:IList<CompraItem>, resenaItems:IList<ResenaItem>, reposicionItems:IList<ReposicionItem>, genero:Genero, editorial:Editorial)
     + Id : int <<get>> <<set>>
     + Titulo : string <<get>> <<set>>
     + TipoLibro : string <<get>> <<set>>
     + Autor : string <<get>> <<set>>
     + CalificacionMedia : double <<get>> <<set>>
     + FechaLanzamiento : DateTime <<get>> <<set>>
+    + CompraItems : IList<CompraItem> <<get>> <<set>>
     + ResenaItems : IList<ResenaItem> <<get>> <<set>>
+    + ReposicionItems : IList<ReposicionItem> <<get>> <<set>>
     + Genero : Genero <<get>> <<set>>
     + Editorial : Editorial <<get>> <<set>>
 }

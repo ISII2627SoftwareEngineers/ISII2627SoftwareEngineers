@@ -13,11 +13,13 @@ namespace AppForSEII.API.Models
         }
 
         // Constructor con parametros para inicializar los atributos
-        public CompraItem(int cantidad, int libroId, int compraId)
+        public CompraItem(int cantidad, int libroId, int compraId, Libro libro, Compra compra)
         {
             Cantidad = cantidad;
             LibroId = libroId;
             CompraId = compraId;
+            Libro = libro;
+            Compra = compra;
         }
 
         [Required]

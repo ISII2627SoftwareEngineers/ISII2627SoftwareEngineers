@@ -1,5 +1,6 @@
 @startuml
 hide methods
+hide Resena
 !include Editorial.puml
 !include Libro.puml
 !include Compra.puml
@@ -8,4 +9,6 @@ hide methods
 !include Visa.puml
 !include GooglePay.puml
 !include PayPal.puml
+!include ApplicationUser.puml
+!include Genero.puml
 @enduml

@@ -20,6 +20,9 @@ namespace AppForSEII.API.Models
         public DateTime FechaLanzamiento { get; set; }
 
         public IList<ResenaItem> ResenaItems { get; set; }
+
+        public IList<ReposicionItem>ReposicionItems {get; set;}
+
         public Genero Genero { get; set; }
         public Editorial Editorial { get; set; }
     }

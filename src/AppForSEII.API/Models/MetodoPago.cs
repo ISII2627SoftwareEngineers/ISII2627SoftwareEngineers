@@ -7,6 +7,8 @@ namespace AppForSEII.API.Models
         [Key]
         public int Id { get; set; }
 
+
         public Reposicion Reposicion {get; set;}
+        public IList<Compra> Compras { get; set; } // Relacion 1 a N hacia Compra
     }
 }

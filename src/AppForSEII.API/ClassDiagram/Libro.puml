@@ -14,4 +14,5 @@ class Libro {
     + Genero : Genero <<get>> <<set>>
     + Editorial : Editorial <<get>> <<set>>
 }
+Libro "1" -- "0..* CompraItems" CompraItem //para caso de uso comprar libros
 @enduml

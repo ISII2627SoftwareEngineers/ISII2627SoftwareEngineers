@@ -9,5 +9,9 @@ class ApplicationUser {
     + Reposiciones : IList<Reposicion> <<get>> <<set>>
 }
 ApplicationUser "1" -- "0..* Resenas" Resena
+
+'para caso de uso comprar libros
+ApplicationUser "1" -- "0..* Compras" Compra
+
 IdentityUser <|-- ApplicationUser
 @enduml

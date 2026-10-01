@@ -6,4 +6,13 @@ hide methods
 !include Genero.puml
 !include ReposicionItem.puml
 !include Visa.puml
+!include GooglePay.puml
+!include Paypal.puml
+
+
+Genero -- "Libro"
+ApplicationUser -- "Reposicion"
+Libro --  "ReposicionItem"
+Reposicion -- "ReposicionItem"
+Reposicion -- "MetodoPago"
 @enduml

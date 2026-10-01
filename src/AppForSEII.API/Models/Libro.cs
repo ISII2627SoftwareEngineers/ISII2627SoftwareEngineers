@@ -21,6 +21,9 @@ namespace AppForSEII.API.Models
 
         public IList<CompraItem> CompraItems { get; set; } // Relación 1 a N con CompraItem
         public IList<ResenaItem> ResenaItems { get; set; }
+
+        public IList<ReposicionItem>ReposicionItems {get; set;}
+
         public Genero Genero { get; set; }
         public Editorial Editorial { get; set; }
     }

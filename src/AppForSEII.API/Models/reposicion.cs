@@ -16,6 +16,12 @@ public class Reposicion
     [StringLength(500, ErrorMessage = "El comentario no puede superar los 500 caracteres.")]
     public string? Comentario { get; set; }
 
+    public IList<ReposicionItem>ReposicionItems {get; set;}
+
+
+    public IList<MetodoPago> MetodosPago {get; set;}
+
+    public ApplicationUser Usuario{ get; set;}
     public Reposicion()
     {
     }

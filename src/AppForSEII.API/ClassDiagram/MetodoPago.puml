@@ -6,4 +6,6 @@ class MetodoPago {
     + Reposicion : Reposicion <<get>> <<set>>
     + Compras : IList<Compra> <<get>> <<set>>
 }
+'para caso de uso comprar libros
+MetodoPago "1" -- "0..* Compras" Compra 
 @enduml

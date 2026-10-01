@@ -7,18 +7,14 @@ public class ApplicationUser : IdentityUser
 {
     public ApplicationUser()
     {
-        Resenas = new List<Resena>();
-        Compras = new List<Compra>();
-        Reposiciones = new List<Reposicion>();
     }
-
-    public ApplicationUser(string? name, string? surname, IList<Resena> resenas, IList<Compra> compras, IList<Reposicion> reposiciones)
+    public ApplicationUser(string id, string name, string surname, string userName)
     {
+        Id = id;
         Name = name;
         Surname = surname;
-        Resenas = resenas ?? new List<Resena>();
-        Compras = compras ?? new List<Compra>();
-        Reposiciones = reposiciones ?? new List<Reposicion>();
+        UserName = userName;
+        Email = userName;
     }
 
     [StringLength(50)]

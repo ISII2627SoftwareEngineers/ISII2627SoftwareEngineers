@@ -12,9 +12,13 @@ namespace AppForSEII.API.Models
 
         [Required]
         public int LibroId { get; set; }
+        public Libro Libro{ get; set;}
 
         [Required]
-        public int ReposicionId { get; set; }
+        public int ReposicionId { get; set;}
+        public Reposicion Reposicion { get; set;}
+
+
 
         public ReposicionItem(){}
 

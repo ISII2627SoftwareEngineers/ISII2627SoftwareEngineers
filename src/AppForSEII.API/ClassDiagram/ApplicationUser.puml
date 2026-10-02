@@ -13,5 +13,8 @@ ApplicationUser "1" -- "0..* Resenas" Resena
 'para caso de uso comprar libros
 ApplicationUser "1" -- "0..* Compras" Compra
 
+ApplicationUser "1" -- "0..* Reposicion" Reposicion 
+
+
 IdentityUser <|-- ApplicationUser
 @enduml

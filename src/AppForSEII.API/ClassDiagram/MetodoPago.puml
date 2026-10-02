@@ -8,4 +8,6 @@ class MetodoPago {
 }
 'para caso de uso comprar libros
 MetodoPago "1" -- "0..* Compras" Compra 
+
+MetodoPago "1" -- "0..* Reposicion" Reposicion
 @enduml

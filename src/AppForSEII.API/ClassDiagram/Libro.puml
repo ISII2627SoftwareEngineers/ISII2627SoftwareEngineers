@@ -16,4 +16,6 @@ class Libro {
 }
 'para caso de uso comprar libros
 Libro "1" -- "0..* CompraItems" CompraItem 
+
+Libro "1" -- "0..* ReposicionItem" ReposicionItem 
 @enduml

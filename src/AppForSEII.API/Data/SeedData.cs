@@ -19,7 +19,12 @@ namespace AppForSEII.API.Data {
                 logger.LogError(ex, "An error occurred seeding the Users in the Database.");
             }
 
- 
+            try {
+                SeedGenerosEditorialesYLibros(dbContext);
+            }
+            catch (Exception ex) {
+                logger.LogError(ex, "An error occurred seeding the Books, Genres and Editorials in the Database.");
+            }
 
         }
 
@@ -71,9 +76,85 @@ namespace AppForSEII.API.Data {
 
         }
 
+public static void SeedGenerosEditorialesYLibros(ApplicationDbContext dbContext) {
+            string[] nombresGeneros = ["Fantasia", "Ciencia Ficcion", "Terror"];
+            List<Genero> generos = [];
+            Libro libro;
 
+            foreach (string nombreGenero in nombresGeneros) {
+                var genero = dbContext.Generos.FirstOrDefault(g => g.Nombre == nombreGenero);
+                if (genero == null)
+                generos.Add(new Genero { Nombre = nombreGenero });
+                else
+                    generos.Add(genero);
+            }
 
+            string[] nombresEditoriales = ["SM", "Planeta", "Anaya"];
+            List<Editorial> editoriales = [];
+            
+            foreach (string nombreEditorial in nombresEditoriales) {
+                var editorial = dbContext.Editoriales.FirstOrDefault(e => e.Nombre == nombreEditorial);
+                if (editorial == null)
+                    editoriales.Add(new Editorial { Nombre = nombreEditorial });
+                else
+                    editoriales.Add(editorial);
+            }
 
+if (dbContext.Libros.FirstOrDefault(l => l.Titulo == "Las maravillosas aventuras de Chipi") == null) {
+    libro = new Libro {
+        Titulo = "Las maravillosas aventuras de Chipi",
+        Autor = "Sergio Muñon",
+        TipoLibro = "Fisico",
+        CalificacionMedia = 5.0,
+        FechaLanzamiento = new DateTime(2023, 5, 10).ToUniversalTime(),
+        Genero = generos[0],
+        Editorial = editoriales[0]
+    };
+    dbContext.Libros.Add(libro);
+}
+
+if (dbContext.Libros.FirstOrDefault(l => l.Titulo == "Dune") == null) {
+    libro = new Libro {
+        Titulo = "Dune",
+        Autor = "Frank Herbert",
+        TipoLibro = "Bolsillo",
+        CalificacionMedia = 4.8,
+        FechaLanzamiento = new DateTime(1965, 8, 1).ToUniversalTime(),
+        Genero = generos[1],
+        Editorial = editoriales[0]
+    };
+    dbContext.Libros.Add(libro);
+}
+
+if (dbContext.Libros.FirstOrDefault(l => l.Titulo == "Juego de Tronos") == null) {
+    libro = new Libro {
+        Titulo = "Juego de Tronos",
+        Autor = "George R. R. Martin",
+        TipoLibro = "Tapa dura",
+        CalificacionMedia = 4.9,
+        FechaLanzamiento = new DateTime(1996, 8, 6).ToUniversalTime(),
+        Genero = generos[0],
+        Editorial = editoriales[1]
+    };
+    dbContext.Libros.Add(libro);
+}
+
+if (dbContext.Libros.FirstOrDefault(l => l.Titulo == "Los Pilares de la Tierra") == null) {
+    libro = new Libro {
+        Titulo = "Los Pilares de la Tierra",
+        Autor = "Ken Follett",
+        TipoLibro = "Digital",
+        CalificacionMedia = 4.7,
+        FechaLanzamiento = new DateTime(1989, 10, 1).ToUniversalTime(),
+        Genero = generos[2],
+        Editorial = editoriales[2]
+    };
+    dbContext.Libros.Add(libro);
+}
+
+            dbContext.SaveChanges();
+            
+}
 
     }
 }

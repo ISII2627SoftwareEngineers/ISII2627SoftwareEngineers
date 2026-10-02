@@ -12,4 +12,7 @@ class Reposicion {
     + <<override>> Equals(obj:object?) : bool
     + <<override>> GetHashCode() : int
 }
+
+Reposicion "1" -- "0..* ReposicionItem" ReposicionItem 
+
 @enduml

@@ -1,5 +1,8 @@
 @startuml
 hide methods
+hide Compra
+hide CompraItem
+hide Resena
 !include Libro.puml
 !include Reposicion.puml
 !include MetodoPago.puml
@@ -8,11 +11,5 @@ hide methods
 !include Visa.puml
 !include GooglePay.puml
 !include Paypal.puml
-
-
-Genero -- "Libro"
-ApplicationUser -- "Reposicion"
-Libro --  "ReposicionItem"
-Reposicion -- "ReposicionItem"
-Reposicion -- "MetodoPago"
+!include ApplicationUser.puml
 @enduml

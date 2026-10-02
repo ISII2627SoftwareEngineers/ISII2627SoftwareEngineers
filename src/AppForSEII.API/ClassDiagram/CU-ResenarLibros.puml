@@ -1,5 +1,7 @@
 @startuml
 hide methods
+hide Compra
+hide CompraItem
 !include Libro.puml
 !include Genero.puml
 !include Editorial.puml

@@ -10,4 +10,6 @@ class Compra {
     + CompraItems : IList<CompraItem> <<get>> <<set>>
     + Usuario : ApplicationUser <<get>> <<set>>
 }
+'para caso de uso comprar libros
+Compra "1" -- "0..* CompraItems" CompraItem 
 @enduml

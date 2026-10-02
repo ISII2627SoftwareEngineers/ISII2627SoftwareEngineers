@@ -2,6 +2,8 @@
 hide methods
 hide Compra
 hide CompraItem
+hide Reposicion
+hide ReposicionItem
 !include Libro.puml
 !include Genero.puml
 !include Editorial.puml

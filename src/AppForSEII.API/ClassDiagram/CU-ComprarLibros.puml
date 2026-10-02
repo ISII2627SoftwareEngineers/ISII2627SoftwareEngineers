@@ -1,6 +1,8 @@
 @startuml
 hide methods
 hide Resena
+hide Reposicion
+hide ReposicionItem
 !include Editorial.puml
 !include Libro.puml
 !include Compra.puml

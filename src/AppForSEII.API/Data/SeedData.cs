@@ -26,6 +26,18 @@ namespace AppForSEII.API.Data {
                 logger.LogError(ex, "An error occurred seeding the Books, Genres and Editorials in the Database.");
             }
 
+            try {
+                var user = dbContext.Users.OfType<ApplicationUser>().FirstOrDefault(u => u.UserName == "peter@uclm.es");
+
+                if (user == null) 
+                    logger.LogError("An error occurred seeding Reviews in the Database: user does not exist");
+                else
+                    SeedResenas(dbContext, user);
+            }
+            catch (Exception ex) {
+                logger.LogError(ex, "An error occurred seeding the Reviews (Resenas) in the Database.");
+            }
+
         }
 
         public static void SeedRoles(RoleManager<IdentityRole> roleManager, List<string> roles) {
@@ -113,10 +125,10 @@ if (dbContext.Libros.FirstOrDefault(l => l.Titulo == "Las maravillosas aventuras
     dbContext.Libros.Add(libro);
 }
 
-if (dbContext.Libros.FirstOrDefault(l => l.Titulo == "Dune") == null) {
+if (dbContext.Libros.FirstOrDefault(l => l.Titulo == "Wigetta") == null) {
     libro = new Libro {
-        Titulo = "Dune",
-        Autor = "Frank Herbert",
+        Titulo = "Wigetta",
+        Autor = "Willyrex",
         TipoLibro = "Bolsillo",
         CalificacionMedia = 4.8,
         FechaLanzamiento = new DateTime(1965, 8, 1).ToUniversalTime(),
@@ -126,10 +138,10 @@ if (dbContext.Libros.FirstOrDefault(l => l.Titulo == "Dune") == null) {
     dbContext.Libros.Add(libro);
 }
 
-if (dbContext.Libros.FirstOrDefault(l => l.Titulo == "Juego de Tronos") == null) {
+if (dbContext.Libros.FirstOrDefault(l => l.Titulo == "El libro troll") == null) {
     libro = new Libro {
-        Titulo = "Juego de Tronos",
-        Autor = "George R. R. Martin",
+        Titulo = "El libro troll",
+        Autor = "elrubius",
         TipoLibro = "Tapa dura",
         CalificacionMedia = 4.9,
         FechaLanzamiento = new DateTime(1996, 8, 6).ToUniversalTime(),
@@ -139,10 +151,10 @@ if (dbContext.Libros.FirstOrDefault(l => l.Titulo == "Juego de Tronos") == null)
     dbContext.Libros.Add(libro);
 }
 
-if (dbContext.Libros.FirstOrDefault(l => l.Titulo == "Los Pilares de la Tierra") == null) {
+if (dbContext.Libros.FirstOrDefault(l => l.Titulo == "Los Juegos del Hambre") == null) {
     libro = new Libro {
-        Titulo = "Los Pilares de la Tierra",
-        Autor = "Ken Follett",
+        Titulo = "Los Juegos del Hambre",
+        Autor = "Suzanne Collins",
         TipoLibro = "Digital",
         CalificacionMedia = 4.7,
         FechaLanzamiento = new DateTime(1989, 10, 1).ToUniversalTime(),
@@ -155,6 +167,38 @@ if (dbContext.Libros.FirstOrDefault(l => l.Titulo == "Los Pilares de la Tierra")
             dbContext.SaveChanges();
             
 }
+
+public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser user) {
+            var libros = dbcontext.Libros.Take(4).ToList();
+
+            if (libros.Count >= 4) {
+                if (dbcontext.Resenas.FirstOrDefault(p => p.Titulo == "Excelente libro!") == null) {
+                    var resena = new Resena(0, "Excelente libro!", new DateTime(2023, 10, 12).ToUniversalTime(), user, new List<ResenaItem>());
+                    resena.ResenaItems.Add(new ResenaItem(5, "Una obra maestra indiscutible, me ha encantado.", libros[0].Id, libros[0], resena.Id, resena));
+                    dbcontext.Resenas.Add(resena);
+                }
+
+                if (dbcontext.Resenas.FirstOrDefault(p => p.Titulo == "Muy recomendable") == null) {
+                    var resena = new Resena(0, "Muy recomendable", new DateTime(2023, 11, 5).ToUniversalTime(), user, new List<ResenaItem>());
+                    resena.ResenaItems.Add(new ResenaItem(4, "Muy entretenido y divertido para pasar el rato.", libros[1].Id, libros[1], resena.Id, resena));
+                    dbcontext.Resenas.Add(resena);
+                }
+
+                if (dbcontext.Resenas.FirstOrDefault(p => p.Titulo == "No me ha gustado") == null) {
+                    var resena = new Resena(0, "No me ha gustado", new DateTime(2024, 1, 20).ToUniversalTime(), user, new List<ResenaItem>());
+                    resena.ResenaItems.Add(new ResenaItem(2, "Esperaba algo diferente, no conecté con la trama.", libros[2].Id, libros[2], resena.Id, resena));
+                    dbcontext.Resenas.Add(resena);
+                }
+
+                if (dbcontext.Resenas.FirstOrDefault(p => p.Titulo == "Lectura aburrida") == null) {
+                    var resena = new Resena(0, "Lectura aburrida", new DateTime(2024, 2, 14).ToUniversalTime(), user, new List<ResenaItem>());
+                    resena.ResenaItems.Add(new ResenaItem(1, "Se me hizo muy pesado de leer desde el principio.", libros[3].Id, libros[3], resena.Id, resena));
+                    dbcontext.Resenas.Add(resena);
+                }
+
+                dbcontext.SaveChanges();
+            }
+        }
 
     }
 }

@@ -38,6 +38,18 @@ namespace AppForSEII.API.Data {
                 logger.LogError(ex, "An error occurred seeding the Reviews (Resenas) in the Database.");
             }
 
+            try {
+                 var user = dbContext.Users.OfType<ApplicationUser>().FirstOrDefault(u => u.UserName == "peter@uclm.es");
+
+                if (user == null) 
+                    logger.LogError("An error occurred seeding Purchases in the Database: user does not exist");
+                else
+                    SeedCompras(dbContext, user);
+            }
+            catch (Exception ex) {
+                logger.LogError(ex, "An error occurred seeding the Purchases (Compras) in the Database.");
+            }
+
         }
 
         public static void SeedRoles(RoleManager<IdentityRole> roleManager, List<string> roles) {
@@ -199,6 +211,85 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
                 dbcontext.SaveChanges();
             }
         }
+
+
+    //SeedCompras: este metodo añade datos de prueba para la entidad Compra y CompraItem, MetodoPago(Visa, PayPal y GooglePay). 
+    //Se asume que ya existen libros en la base de datos y un usuario con el que se asociarán las compras.
+    public static void SeedCompras(ApplicationDbContext dbContext, ApplicationUser user) {
+    var libros = dbContext.Libros.Take(4).ToList();
+
+    if (libros.Count >= 4) {
+        // 1. Crear o recuperar métodos de pago de prueba si no existen
+        var visa = dbContext.Set<Visa>().FirstOrDefault(v => v.NumeroTarjeta == 12345678);
+        if (visa == null) {
+            visa = new Visa(12345678, new DateTime(2028, 12, 31).ToUniversalTime());
+            dbContext.Set<Visa>().Add(visa);
+        }
+
+        var paypal = dbContext.Set<PayPal>().FirstOrDefault(p => p.NumeroTelefono == "600123456");
+        if (paypal == null) {
+            paypal = new PayPal("600123456");
+            dbContext.Set<PayPal>().Add(paypal);
+        }
+
+        var googlePay = dbContext.Set<GooglePay>().FirstOrDefault(g => g.Email == "peter@gmail.com");
+        if (googlePay == null) {
+            googlePay = new GooglePay("peter@gmail.com");
+            dbContext.Set<GooglePay>().Add(googlePay);
+        }
+
+        dbContext.SaveChanges();
+
+        // 2. Insertar 4 filas/tuplas de Compra con sus respectivos CompraItem
+        if (!dbContext.Compras.Any()) {
+            var compra1 = new Compra {
+                FechaCompra = new DateTime(2023, 10, 15).ToUniversalTime(),
+                PrecioTotal = 30.0,
+                CodigoDescuento = "DESC10", // Entre 5 y 10 caracteres
+                MetodoPago = visa,
+                Usuario = user,
+                CompraItems = new List<CompraItem>()
+            };
+            compra1.CompraItems.Add(new CompraItem { Cantidad = 2, LibroId = libros[0].Id, Libro = libros[0], Compra = compra1 });
+            dbContext.Compras.Add(compra1);
+
+            var compra2 = new Compra {
+                FechaCompra = new DateTime(2023, 11, 20).ToUniversalTime(),
+                PrecioTotal = 45.0,
+                CodigoDescuento = "PROMO5",
+                MetodoPago = paypal,
+                Usuario = user,
+                CompraItems = new List<CompraItem>()
+            };
+            compra2.CompraItems.Add(new CompraItem { Cantidad = 3, LibroId = libros[1].Id, Libro = libros[1], Compra = compra2 });
+            dbContext.Compras.Add(compra2);
+
+            var compra3 = new Compra {
+                FechaCompra = new DateTime(2024, 1, 10).ToUniversalTime(),
+                PrecioTotal = 20.0,
+                CodigoDescuento = "OFERTA",
+                MetodoPago = googlePay,
+                Usuario = user,
+                CompraItems = new List<CompraItem>()
+            };
+            compra3.CompraItems.Add(new CompraItem { Cantidad = 2, LibroId = libros[2].Id, Libro = libros[2], Compra = compra3 });
+            dbContext.Compras.Add(compra3);
+
+            var compra4 = new Compra {
+                FechaCompra = new DateTime(2024, 2, 5).ToUniversalTime(),
+                PrecioTotal = 60.0,
+                CodigoDescuento = "VERANO",
+                MetodoPago = visa,
+                Usuario = user,
+                CompraItems = new List<CompraItem>()
+            };
+            compra4.CompraItems.Add(new CompraItem { Cantidad = 4, LibroId = libros[3].Id, Libro = libros[3], Compra = compra4 });
+            dbContext.Compras.Add(compra4);
+
+            dbContext.SaveChanges();
+        }
+    }
+}
 
     }
 }

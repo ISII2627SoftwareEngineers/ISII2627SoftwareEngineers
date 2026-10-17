@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using AppForSEII.API.DTOs;
 using AppForSEII.API.Data;
 using System.Net;
+using AppForSEII.API.DTOs.LibroDTOs; // importé el namespace del DTO LibroParaComprarDTO para poder usarlo en el controlador
 
 namespace AppForSEII.API.Controllers
 {
@@ -35,5 +36,33 @@ namespace AppForSEII.API.Controllers
 
             return Ok(libros);
         }
+
+
+        //Controlador para obtener los libros disponibles para comprar, devolviendo un DTO con los atributos relevantes para la compra.
+        [HttpGet]
+        [Route("[action]")]
+        [ProducesResponseType(typeof(IList<LibroParaComprarDTO>), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult> GetLibrosParaComprar()
+        {
+            var libros = await _context.Libros
+                .Include(l => l.Genero)
+                .Include(l => l.Editorial)
+                .Select(l => new LibroParaComprarDTO(
+                    l.Id,
+                    l.Titulo,
+                    l.Autor,
+                    l.TipoLibro,
+                    l.CalificacionMedia,
+                    l.Genero != null ? l.Genero.Nombre : string.Empty,
+                    l.Editorial != null ? l.Editorial.Nombre : string.Empty
+                ))
+                .ToListAsync();
+
+            return Ok(libros);
+        }
     }
+
+
+
+    
 }

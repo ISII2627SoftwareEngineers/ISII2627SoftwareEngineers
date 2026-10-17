@@ -67,7 +67,7 @@ namespace AppForSEII.API.DTOs.LibroDTOs
             return false;
         }
 
-        // GetHashCode: La "huella digital" del objeto, obligatoria siempre de la mano del Equals.
+        // GetHashCode: C# obliga por norma a ponerlo siempre de la mano del Equals para que el sistema sepa ubicar y comparar el DTO correctamente.
         public override int GetHashCode()
         {
             return HashCode.Combine(Id, Titulo, Autor, TipoLibro, CalificacionMedia, Genero, Editorial);

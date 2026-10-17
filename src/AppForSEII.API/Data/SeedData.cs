@@ -38,6 +38,18 @@ namespace AppForSEII.API.Data {
                 logger.LogError(ex, "An error occurred seeding the Reviews (Resenas) in the Database.");
             }
 
+            try {
+                 var user = dbContext.Users.OfType<ApplicationUser>().FirstOrDefault(u => u.UserName == "peter@uclm.es");
+
+                if (user == null) 
+                    logger.LogError("An error occurred seeding Purchases in the Database: user does not exist");
+                else
+                    SeedCompras(dbContext, user);
+            }
+            catch (Exception ex) {
+                logger.LogError(ex, "An error occurred seeding the Purchases (Compras) in the Database.");
+            }
+
         }
 
         public static void SeedRoles(RoleManager<IdentityRole> roleManager, List<string> roles) {
@@ -199,6 +211,68 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
                 dbcontext.SaveChanges();
             }
         }
+
+
+    //SeedCompras: este metodo añade datos de prueba para la entidad Compra y CompraItem.
+    //Se asume que ya existen libros en la base de datos y un usuario con el que se asociarán las compras.
+    //NOTA:
+    //Los datos en metodoPago de cada instancia no hay porque el otro compañero encargado de meter datos en la tabla Reposicion y 
+    // ReposicionItem, que es el que tiene el metodoPago tambien, tiene que insertar datos para que pueda haber 
+    // datos de prueba en la tabla Compra y CompraItem. Por tanto, se deja el metodoPago a null.
+    public static void SeedCompras(ApplicationDbContext dbContext, ApplicationUser user) {
+    var libros = dbContext.Libros.Take(4).ToList();
+
+    if (libros.Count >= 4) {
+        // 1. Insertar 4 filas/tuplas de Compra con sus respectivos CompraItem
+        if (!dbContext.Compras.Any()) {
+            var compra1 = new Compra {
+                FechaCompra = new DateTime(2023, 10, 15).ToUniversalTime(),
+                PrecioTotal = 30.0,
+                CodigoDescuento = "DESC10", // Entre 5 y 10 caracteres
+                MetodoPago = null, // No se especifica el método de pago
+                Usuario = user,
+                CompraItems = new List<CompraItem>()
+            };
+            compra1.CompraItems.Add(new CompraItem { Cantidad = 2, LibroId = libros[0].Id, Libro = libros[0], Compra = compra1 });
+            dbContext.Compras.Add(compra1);
+
+            var compra2 = new Compra {
+                FechaCompra = new DateTime(2023, 11, 20).ToUniversalTime(),
+                PrecioTotal = 45.0,
+                CodigoDescuento = "PROMO5",
+                MetodoPago = null, // No se especifica el método de pago
+                Usuario = user,
+                CompraItems = new List<CompraItem>()
+            };
+            compra2.CompraItems.Add(new CompraItem { Cantidad = 3, LibroId = libros[1].Id, Libro = libros[1], Compra = compra2 });
+            dbContext.Compras.Add(compra2);
+
+            var compra3 = new Compra {
+                FechaCompra = new DateTime(2024, 1, 10).ToUniversalTime(),
+                PrecioTotal = 20.0,
+                CodigoDescuento = "OFERTA",
+                MetodoPago = null, // No se especifica el método de pago
+                Usuario = user,
+                CompraItems = new List<CompraItem>()
+            };
+            compra3.CompraItems.Add(new CompraItem { Cantidad = 2, LibroId = libros[2].Id, Libro = libros[2], Compra = compra3 });
+            dbContext.Compras.Add(compra3);
+
+            var compra4 = new Compra {
+                FechaCompra = new DateTime(2024, 2, 5).ToUniversalTime(),
+                PrecioTotal = 60.0,
+                CodigoDescuento = "VERANO",
+                MetodoPago = null, // No se especifica el método de pago
+                Usuario = user,
+                CompraItems = new List<CompraItem>()
+            };
+            compra4.CompraItems.Add(new CompraItem { Cantidad = 4, LibroId = libros[3].Id, Libro = libros[3], Compra = compra4 });
+            dbContext.Compras.Add(compra4);
+
+            dbContext.SaveChanges();
+        }
+    }
+}
 
     }
 }

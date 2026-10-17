@@ -213,40 +213,23 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
         }
 
 
-    //SeedCompras: este metodo añade datos de prueba para la entidad Compra y CompraItem, MetodoPago(Visa, PayPal y GooglePay). 
+    //SeedCompras: este metodo añade datos de prueba para la entidad Compra y CompraItem.
     //Se asume que ya existen libros en la base de datos y un usuario con el que se asociarán las compras.
+    //NOTA:
+    //Los datos en metodoPago de cada instancia no hay porque el otro compañero encargado de meter datos en la tabla Reposicion y 
+    // ReposicionItem, que es el que tiene el metodoPago tambien, tiene que insertar datos para que pueda haber 
+    // datos de prueba en la tabla Compra y CompraItem. Por tanto, se deja el metodoPago a null.
     public static void SeedCompras(ApplicationDbContext dbContext, ApplicationUser user) {
     var libros = dbContext.Libros.Take(4).ToList();
 
     if (libros.Count >= 4) {
-        // 1. Crear o recuperar métodos de pago de prueba si no existen
-        var visa = dbContext.Set<Visa>().FirstOrDefault(v => v.NumeroTarjeta == 12345678);
-        if (visa == null) {
-            visa = new Visa(12345678, new DateTime(2028, 12, 31).ToUniversalTime());
-            dbContext.Set<Visa>().Add(visa);
-        }
-
-        var paypal = dbContext.Set<PayPal>().FirstOrDefault(p => p.NumeroTelefono == "600123456");
-        if (paypal == null) {
-            paypal = new PayPal("600123456");
-            dbContext.Set<PayPal>().Add(paypal);
-        }
-
-        var googlePay = dbContext.Set<GooglePay>().FirstOrDefault(g => g.Email == "peter@gmail.com");
-        if (googlePay == null) {
-            googlePay = new GooglePay("peter@gmail.com");
-            dbContext.Set<GooglePay>().Add(googlePay);
-        }
-
-        dbContext.SaveChanges();
-
-        // 2. Insertar 4 filas/tuplas de Compra con sus respectivos CompraItem
+        // 1. Insertar 4 filas/tuplas de Compra con sus respectivos CompraItem
         if (!dbContext.Compras.Any()) {
             var compra1 = new Compra {
                 FechaCompra = new DateTime(2023, 10, 15).ToUniversalTime(),
                 PrecioTotal = 30.0,
                 CodigoDescuento = "DESC10", // Entre 5 y 10 caracteres
-                MetodoPago = visa,
+                MetodoPago = null, // No se especifica el método de pago
                 Usuario = user,
                 CompraItems = new List<CompraItem>()
             };
@@ -257,7 +240,7 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
                 FechaCompra = new DateTime(2023, 11, 20).ToUniversalTime(),
                 PrecioTotal = 45.0,
                 CodigoDescuento = "PROMO5",
-                MetodoPago = paypal,
+                MetodoPago = null, // No se especifica el método de pago
                 Usuario = user,
                 CompraItems = new List<CompraItem>()
             };
@@ -268,7 +251,7 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
                 FechaCompra = new DateTime(2024, 1, 10).ToUniversalTime(),
                 PrecioTotal = 20.0,
                 CodigoDescuento = "OFERTA",
-                MetodoPago = googlePay,
+                MetodoPago = null, // No se especifica el método de pago
                 Usuario = user,
                 CompraItems = new List<CompraItem>()
             };
@@ -279,7 +262,7 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
                 FechaCompra = new DateTime(2024, 2, 5).ToUniversalTime(),
                 PrecioTotal = 60.0,
                 CodigoDescuento = "VERANO",
-                MetodoPago = visa,
+                MetodoPago = null, // No se especifica el método de pago
                 Usuario = user,
                 CompraItems = new List<CompraItem>()
             };

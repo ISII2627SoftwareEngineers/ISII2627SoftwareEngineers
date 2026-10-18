@@ -14,16 +14,12 @@ public class LibroParaReponerDTO
 
     public string Editorial { get; set; }
 
-    public decimal Precio { get; set; }
-
-    // Constructor para proyectar los campos fácilmente desde LINQ (.Select)
-    public LibroParaReponerDTO(int id, string titulo, string genero, string editorial, decimal precio)
+    public LibroParaReponerDTO(int id, string titulo, string genero, string editorial)
     {
         Id = id;
         Titulo = titulo;
         Genero = genero;
         Editorial = editorial;
-        Precio = precio;
     }
 
     // Constructor vacío obligatorio para la serialización JSON
@@ -36,13 +32,12 @@ public class LibroParaReponerDTO
                Id == dto.Id &&
                Titulo == dto.Titulo &&
                Genero == dto.Genero &&
-               Editorial == dto.Editorial &&
-               Precio == dto.Precio;
+               Editorial == dto.Editorial;
     }
 
     // Al sobrescribir Equals es necesario sobrescribir GetHashCode
     public override int GetHashCode()
     {
-        return HashCode.Combine(Id, Titulo, Genero, Editorial, Precio);
+        return HashCode.Combine(Id, Titulo, Genero, Editorial);
     }
 }

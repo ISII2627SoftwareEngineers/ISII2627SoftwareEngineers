@@ -50,6 +50,18 @@ namespace AppForSEII.API.Data {
                 logger.LogError(ex, "An error occurred seeding the Purchases (Compras) in the Database.");
             }
 
+            try {
+                var user = dbContext.Users.OfType<ApplicationUser>().FirstOrDefault(u => u.UserName == "elena@uclm.es");
+
+                if (user == null) 
+                logger.LogError("An error occurred seeding Reposiciones in the Database: user does not exist");
+                else
+                SeedReposiciones(dbContext, user);
+                }
+            catch (Exception ex) {
+                logger.LogError(ex, "An error occurred seeding the Reposiciones in the Database.");
+            }
+
         }
 
         public static void SeedRoles(RoleManager<IdentityRole> roleManager, List<string> roles) {
@@ -274,5 +286,137 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
     }
 }
 
+
+public static void SeedReposiciones(ApplicationDbContext dbContext, ApplicationUser user)
+{
+    var libros = dbContext.Libros.Take(4).ToList();
+
+    if (libros.Count >= 4)
+    {
+        if (!dbContext.Reposiciones.Any())
+        {
+            // --- Métodos de pago ---
+            var metodoPagoVisa = new Visa
+            {
+                NumeroTarjeta = 12345678,
+                FechaCaducidad = new DateTime(2028, 12, 31).ToUniversalTime()
+            };
+
+            var metodoPagoPaypal = new PayPal
+            {
+                NumeroTelefono = "655322368"
+            };
+
+            var metodoPagoGooglePay = new GooglePay
+            {
+                Email = "chipi@uclm.es"
+            };
+
+            var metodoPagoVisa2 = new Visa
+            {
+                NumeroTarjeta = 87654321,
+                FechaCaducidad = new DateTime(2027, 6, 30).ToUniversalTime()
+            };
+
+            // --- Ejemplo 1: Reposición con Visa ---
+            var reposicion1 = new Reposicion
+            {
+                FechaReposicion = new DateTime(2024, 3, 1).ToUniversalTime(),
+                PrecioTotal = 150.0m,
+                Usuario = user,
+                MetodosPago = new List<MetodoPago> { metodoPagoVisa },
+                ReposicionItems = new List<ReposicionItem>()
+            };
+
+            reposicion1.ReposicionItems.Add(new ReposicionItem
+            {
+                CantidadReposicion = 10,
+                LibroId = libros[0].Id,
+                Libro = libros[0],
+                Reposicion = reposicion1
+            });
+
+            reposicion1.ReposicionItems.Add(new ReposicionItem
+            {
+                CantidadReposicion = 5,
+                LibroId = libros[1].Id,
+                Libro = libros[1],
+                Reposicion = reposicion1
+            });
+
+            dbContext.Reposiciones.Add(reposicion1);
+
+            // --- Ejemplo 2: Reposición con PayPal ---
+            var reposicion2 = new Reposicion
+            {
+                FechaReposicion = new DateTime(2024, 3, 15).ToUniversalTime(),
+                PrecioTotal = 80.0m,
+                Usuario = user,
+                MetodosPago = new List<MetodoPago> { metodoPagoPaypal },
+                ReposicionItems = new List<ReposicionItem>()
+            };
+
+            reposicion2.ReposicionItems.Add(new ReposicionItem
+            {
+                CantidadReposicion = 8,
+                LibroId = libros[0].Id,
+                Libro = libros[0],
+                Reposicion = reposicion2
+            });
+
+            dbContext.Reposiciones.Add(reposicion2);
+
+            // --- Ejemplo 3: Reposición con GooglePay ---
+            var reposicion3 = new Reposicion
+            {
+                FechaReposicion = new DateTime(2024, 4, 2).ToUniversalTime(),
+                PrecioTotal = 120.50m,
+                Usuario = user,
+                MetodosPago = new List<MetodoPago> { metodoPagoGooglePay },
+                ReposicionItems = new List<ReposicionItem>()
+            };
+
+            reposicion3.ReposicionItems.Add(new ReposicionItem
+            {
+                CantidadReposicion = 12,
+                LibroId = libros[2].Id,
+                Libro = libros[2],
+                Reposicion = reposicion3
+            });
+
+            dbContext.Reposiciones.Add(reposicion3);
+
+            // --- Ejemplo 4: Reposición variada con múltiples ítems (Visa) ---
+            var reposicion4 = new Reposicion
+            {
+                FechaReposicion = new DateTime(2024, 4, 18).ToUniversalTime(),
+                PrecioTotal = 210.0m,
+                Usuario = user,
+                MetodosPago = new List<MetodoPago> { metodoPagoVisa2 },
+                ReposicionItems = new List<ReposicionItem>()
+            };
+
+            reposicion4.ReposicionItems.Add(new ReposicionItem
+            {
+                CantidadReposicion = 15,
+                LibroId = libros[1].Id,
+                Libro = libros[1],
+                Reposicion = reposicion4
+            });
+
+            reposicion4.ReposicionItems.Add(new ReposicionItem
+            {
+                CantidadReposicion = 6,
+                LibroId = libros[3].Id,
+                Libro = libros[3],
+                Reposicion = reposicion4
+            });
+
+            dbContext.Reposiciones.Add(reposicion4);
+
+            dbContext.SaveChanges();
+        }
+    }
+}
     }
 }

@@ -239,10 +239,7 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
 
     //SeedCompras: este metodo añade datos de prueba para la entidad Compra y CompraItem.
     //Se asume que ya existen libros en la base de datos y un usuario con el que se asociarán las compras.
-    //NOTA:
-    //Los datos en metodoPago de cada instancia no hay porque el otro compañero encargado de meter datos en la tabla Reposicion y 
-    // ReposicionItem, que es el que tiene el metodoPago tambien, tiene que insertar datos para que pueda haber 
-    // datos de prueba en la tabla Compra y CompraItem. Por tanto, se deja el metodoPago a null.
+    
     public static void SeedCompras(ApplicationDbContext dbContext, ApplicationUser user) {
     var libros = dbContext.Libros.Take(4).ToList();
 
@@ -268,7 +265,8 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
                     NumeroTarjeta = "4532123456789012",
                     FechaCaducidad = new DateTime(2029, 6, 30).ToUniversalTime()
                 };
-
+            // Agregamos los métodos de pago al dbContext
+                dbContext.MetodosPago.AddRange(pagoVisa, pagoPaypal, pagoGooglePay, pagoVisa2);    
 
             //Compras asociadas a los metodos de pago
             var compra1 = new Compra {

@@ -60,8 +60,28 @@ namespace AppForSEII.API.Controllers
 
             return Ok(libros);
         }
-    }
 
+    [HttpGet]
+        [Route("[action]")]
+        [ProducesResponseType(typeof(IList<LibroParaReponerDTO>), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult> GetLibrosParaReponer(string? titulo, string? genero)
+        {
+            var libros = await _context.Libros
+                .Include(l => l.Genero)
+                .Include(l => l.Editorial)
+                .Where(l => (titulo == null || l.Titulo.Contains(titulo)) 
+                         && (genero == null || (l.Genero != null && l.Genero.Nombre.Equals(genero))))
+                .Select(l => new LibroParaReponerDTO(
+                    l.Id,
+                    l.Titulo,
+                    l.Genero != null ? l.Genero.Nombre : string.Empty,
+                    l.Editorial != null ? l.Editorial.Nombre : string.Empty
+                ))
+                .ToListAsync();
+
+            return Ok(libros);
+        }
+    }
 
 
     

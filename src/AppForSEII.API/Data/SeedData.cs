@@ -350,6 +350,10 @@ public static void SeedReposiciones(ApplicationDbContext dbContext, ApplicationU
                 FechaCaducidad = new DateTime(2027, 6, 30).ToUniversalTime()
             };
 
+            // Añadirlos los metodo de pago y guardarlos previamente en el contexto para evitar conflictos de FK
+            dbContext.MetodosPago.AddRange(metodoPagoVisa, metodoPagoPaypal, metodoPagoGooglePay, metodoPagoVisa2);
+            dbContext.SaveChanges();
+
             // --- Ejemplo 1: Reposición con Visa ---
             var reposicion1 = new Reposicion
             {
@@ -358,7 +362,7 @@ public static void SeedReposiciones(ApplicationDbContext dbContext, ApplicationU
                 Usuario = user,
                 MetodosPago = new List<MetodoPago> { metodoPagoVisa },
                 ReposicionItems = new List<ReposicionItem>()
-            };
+            }; 
 
             reposicion1.ReposicionItems.Add(new ReposicionItem
             {

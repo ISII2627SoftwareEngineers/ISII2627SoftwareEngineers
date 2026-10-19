@@ -143,6 +143,9 @@ if (dbContext.Libros.FirstOrDefault(l => l.Titulo == "Las maravillosas aventuras
         TipoLibro = "Fisico",
         CalificacionMedia = 5.0,
         FechaLanzamiento = new DateTime(2023, 5, 10).ToUniversalTime(),
+        PrecioCompra = 15.0m,       
+        PrecioReposicion = 10.0m,   
+        Stock = 20,                 
         Genero = generos[0],
         Editorial = editoriales[0]
     };
@@ -156,6 +159,9 @@ if (dbContext.Libros.FirstOrDefault(l => l.Titulo == "Wigetta") == null) {
         TipoLibro = "Bolsillo",
         CalificacionMedia = 4.8,
         FechaLanzamiento = new DateTime(1965, 8, 1).ToUniversalTime(),
+        PrecioCompra = 12.5m,       
+        PrecioReposicion = 8.0m,    
+        Stock = 15,                 
         Genero = generos[1],
         Editorial = editoriales[0]
     };
@@ -169,6 +175,9 @@ if (dbContext.Libros.FirstOrDefault(l => l.Titulo == "El libro troll") == null) 
         TipoLibro = "Tapa dura",
         CalificacionMedia = 4.9,
         FechaLanzamiento = new DateTime(1996, 8, 6).ToUniversalTime(),
+        PrecioCompra = 18.0m,       
+        PrecioReposicion = 12.0m,   
+        Stock = 25,                 
         Genero = generos[0],
         Editorial = editoriales[1]
     };
@@ -182,6 +191,9 @@ if (dbContext.Libros.FirstOrDefault(l => l.Titulo == "Los Juegos del Hambre") ==
         TipoLibro = "Digital",
         CalificacionMedia = 4.7,
         FechaLanzamiento = new DateTime(1989, 10, 1).ToUniversalTime(),
+        PrecioCompra = 20.0m,       
+        PrecioReposicion = 14.0m,   
+        Stock = 30,                 
         Genero = generos[2],
         Editorial = editoriales[2]
     };
@@ -237,11 +249,33 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
     if (libros.Count >= 4) {
         // 1. Insertar 4 filas/tuplas de Compra con sus respectivos CompraItem
         if (!dbContext.Compras.Any()) {
+            
+            // Metodos de pago para las compras
+                var pagoVisa = new Visa {
+                    NumeroTarjeta = "4000123456789010",
+                    FechaCaducidad = new DateTime(2028, 12, 31).ToUniversalTime()
+                };
+
+                var pagoPaypal = new PayPal {
+                    NumeroTelefono = "600123456"
+                };
+
+                var pagoGooglePay = new GooglePay {
+                    Email = "peter.cliente@uclm.es"
+                };
+
+                var pagoVisa2 = new Visa {
+                    NumeroTarjeta = "4532123456789012",
+                    FechaCaducidad = new DateTime(2029, 6, 30).ToUniversalTime()
+                };
+
+
+            //Compras asociadas a los metodos de pago
             var compra1 = new Compra {
                 FechaCompra = new DateTime(2023, 10, 15).ToUniversalTime(),
                 PrecioTotal = 30.0,
                 CodigoDescuento = "DESC10", // Entre 5 y 10 caracteres
-                MetodoPago = null, // No se especifica el método de pago
+                MetodoPago = pagoVisa, 
                 Usuario = user,
                 CompraItems = new List<CompraItem>()
             };
@@ -252,7 +286,7 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
                 FechaCompra = new DateTime(2023, 11, 20).ToUniversalTime(),
                 PrecioTotal = 45.0,
                 CodigoDescuento = "PROMO5",
-                MetodoPago = null, // No se especifica el método de pago
+                MetodoPago = pagoPaypal, 
                 Usuario = user,
                 CompraItems = new List<CompraItem>()
             };
@@ -263,7 +297,7 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
                 FechaCompra = new DateTime(2024, 1, 10).ToUniversalTime(),
                 PrecioTotal = 20.0,
                 CodigoDescuento = "OFERTA",
-                MetodoPago = null, // No se especifica el método de pago
+                MetodoPago = pagoGooglePay, 
                 Usuario = user,
                 CompraItems = new List<CompraItem>()
             };
@@ -274,7 +308,7 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
                 FechaCompra = new DateTime(2024, 2, 5).ToUniversalTime(),
                 PrecioTotal = 60.0,
                 CodigoDescuento = "VERANO",
-                MetodoPago = null, // No se especifica el método de pago
+                MetodoPago = pagoVisa2,
                 Usuario = user,
                 CompraItems = new List<CompraItem>()
             };
@@ -298,7 +332,7 @@ public static void SeedReposiciones(ApplicationDbContext dbContext, ApplicationU
             // --- Métodos de pago ---
             var metodoPagoVisa = new Visa
             {
-                NumeroTarjeta = 12345678,
+                NumeroTarjeta = "12345678",
                 FechaCaducidad = new DateTime(2028, 12, 31).ToUniversalTime()
             };
 
@@ -314,7 +348,7 @@ public static void SeedReposiciones(ApplicationDbContext dbContext, ApplicationU
 
             var metodoPagoVisa2 = new Visa
             {
-                NumeroTarjeta = 87654321,
+                NumeroTarjeta = "87654321",
                 FechaCaducidad = new DateTime(2027, 6, 30).ToUniversalTime()
             };
 

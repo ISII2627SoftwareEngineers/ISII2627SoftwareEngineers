@@ -247,34 +247,15 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
         // 1. Insertar 4 filas/tuplas de Compra con sus respectivos CompraItem
         if (!dbContext.Compras.Any()) {
             
-            // Metodos de pago para las compras
-                var pagoVisaCompra1 = new Visa {
-                    NumeroTarjeta = "4000123456789010",
-                    FechaCaducidad = new DateTime(2028, 12, 31).ToUniversalTime()
-                };
 
-                var pagoPaypalCompra = new PayPal {
-                    NumeroTelefono = "600123456"
-                };
-
-                var pagoGooglePayCompra = new GooglePay {
-                    Email = "peter.cliente@uclm.es"
-                };
-
-                var pagoVisaCompra2 = new Visa {
-                    NumeroTarjeta = "4532123456789012",
-                    FechaCaducidad = new DateTime(2029, 6, 30).ToUniversalTime()
-                };
-            // Agregamos los métodos de pago al dbContext
-                dbContext.MetodosPago.AddRange(pagoVisaCompra1, pagoPaypalCompra, pagoGooglePayCompra, pagoVisaCompra2);
-                dbContext.SaveChanges();
+        
 
             //Compras asociadas a los metodos de pago
             var compra1 = new Compra {
                 FechaCompra = new DateTime(2023, 10, 15).ToUniversalTime(),
                 PrecioTotal = 30.0,
                 CodigoDescuento = "DESC10", // Entre 5 y 10 caracteres
-                MetodoPago = pagoVisaCompra1, 
+                MetodoPago = null, 
                 Usuario = user,
                 CompraItems = new List<CompraItem>()
             };
@@ -285,7 +266,7 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
                 FechaCompra = new DateTime(2023, 11, 20).ToUniversalTime(),
                 PrecioTotal = 45.0,
                 CodigoDescuento = "PROMO5",
-                MetodoPago = pagoPaypalCompra, 
+                MetodoPago = null, 
                 Usuario = user,
                 CompraItems = new List<CompraItem>()
             };
@@ -296,7 +277,7 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
                 FechaCompra = new DateTime(2024, 1, 10).ToUniversalTime(),
                 PrecioTotal = 20.0,
                 CodigoDescuento = "OFERTA",
-                MetodoPago = pagoGooglePayCompra, 
+                MetodoPago = null, 
                 Usuario = user,
                 CompraItems = new List<CompraItem>()
             };
@@ -307,7 +288,7 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
                 FechaCompra = new DateTime(2024, 2, 5).ToUniversalTime(),
                 PrecioTotal = 60.0,
                 CodigoDescuento = "VERANO",
-                MetodoPago = pagoVisaCompra2,
+                MetodoPago = null,
                 Usuario = user,
                 CompraItems = new List<CompraItem>()
             };
@@ -351,10 +332,6 @@ public static void SeedReposiciones(ApplicationDbContext dbContext, ApplicationU
                 FechaCaducidad = new DateTime(2027, 6, 30).ToUniversalTime()
             };
 
-            // Añadirlos los metodo de pago y guardarlos previamente en el contexto para evitar conflictos de FK
-            dbContext.MetodosPago.AddRange(metodoPagoVisa, metodoPagoPaypal, metodoPagoGooglePay, metodoPagoVisa2);
-            dbContext.SaveChanges();
-
             // --- Ejemplo 1: Reposición con Visa ---
             var reposicion1 = new Reposicion
             {
@@ -363,7 +340,7 @@ public static void SeedReposiciones(ApplicationDbContext dbContext, ApplicationU
                 Usuario = user,
                 MetodosPago = new List<MetodoPago> { metodoPagoVisa },
                 ReposicionItems = new List<ReposicionItem>()
-            }; 
+            };
 
             reposicion1.ReposicionItems.Add(new ReposicionItem
             {

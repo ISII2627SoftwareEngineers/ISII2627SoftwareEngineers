@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AppForSEII.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20261016075718_CreateIdentitySchema")]
+    [Migration("20261019132713_CreateIdentitySchema")]
     partial class CreateIdentitySchema
     {
         /// <inheritdoc />
@@ -208,6 +208,15 @@ namespace AppForSEII.API.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int>("GeneroId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("PrecioCompra")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PrecioReposicion")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Stock")
                         .HasColumnType("int");
 
                     b.Property<string>("TipoLibro")
@@ -512,8 +521,9 @@ namespace AppForSEII.API.Migrations
                     b.Property<DateTime>("FechaCaducidad")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("NumeroTarjeta")
-                        .HasColumnType("int");
+                    b.Property<string>("NumeroTarjeta")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("Visa");
                 });

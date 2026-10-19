@@ -238,6 +238,9 @@ namespace AppForSEII.API.Migrations
                     Autor = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CalificacionMedia = table.Column<double>(type: "float", nullable: false),
                     FechaLanzamiento = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PrecioCompra = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Stock = table.Column<int>(type: "int", nullable: false),
+                    PrecioReposicion = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     GeneroId = table.Column<int>(type: "int", nullable: false),
                     EditorialId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -268,7 +271,7 @@ namespace AppForSEII.API.Migrations
                     Discriminator = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NumeroTelefono = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NumeroTarjeta = table.Column<int>(type: "int", nullable: true),
+                    NumeroTarjeta = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FechaCaducidad = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>

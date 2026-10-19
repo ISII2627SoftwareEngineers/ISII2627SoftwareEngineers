@@ -29,13 +29,12 @@ namespace AppForSEII.API.DTOs.LibroDTOs
         }
 
         // Constructor con parámetros: Sirve para crear el DTO pasando los datos de golpe en una línea.
-        public LibroParaComprarDTO(int id, string titulo, string autor, string tipoLibro, double calificacionMedia, string genero, string editorial)
+        public LibroParaComprarDTO(int id, string titulo, decimal precioCompra, DateTime fechaLanzamiento, string genero, string editorial)
         {
             Id = id;
             Titulo = titulo;
-            Autor = autor;
-            TipoLibro = tipoLibro;
-            CalificacionMedia = calificacionMedia;
+            PrecioCompra = precioCompra;
+            FechaLanzamiento = fechaLanzamiento;
             Genero = genero;
             Editorial = editorial;
         }
@@ -45,9 +44,8 @@ namespace AppForSEII.API.DTOs.LibroDTOs
         //He puesto string.Empty (que es equivalente a "") 
         //para inicializar la propiedad con una cadena de texto vacía en lugar de dejarla como null
         public string Titulo { get; set; } = string.Empty; 
-        public string Autor { get; set; } = string.Empty;
-        public string TipoLibro { get; set; } = string.Empty;
-        public double CalificacionMedia { get; set; }
+        public decimal PrecioCompra { get; set; }
+        public DateTime FechaLanzamiento { get; set; }
         public string Genero { get; set; } = string.Empty; 
         public string Editorial { get; set; } = string.Empty;
 
@@ -58,9 +56,8 @@ namespace AppForSEII.API.DTOs.LibroDTOs
             {
                 return Id == other.Id &&
                        Titulo == other.Titulo &&
-                       Autor == other.Autor &&
-                       TipoLibro == other.TipoLibro &&
-                       CalificacionMedia == other.CalificacionMedia &&
+                       PrecioCompra == other.PrecioCompra &&
+                       FechaLanzamiento == other.FechaLanzamiento &&
                        Genero == other.Genero &&
                        Editorial == other.Editorial;
             }
@@ -70,7 +67,7 @@ namespace AppForSEII.API.DTOs.LibroDTOs
         // GetHashCode: C# obliga por norma a ponerlo siempre de la mano del Equals para que el sistema sepa ubicar y comparar el DTO correctamente.
         public override int GetHashCode()
         {
-            return HashCode.Combine(Id, Titulo, Autor, TipoLibro, CalificacionMedia, Genero, Editorial);
+            return HashCode.Combine(Id, Titulo, PrecioCompra, FechaLanzamiento, Genero, Editorial);
         }
 
     }

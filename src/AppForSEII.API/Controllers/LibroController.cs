@@ -20,23 +20,33 @@ namespace AppForSEII.API.Controllers
             _logger = logger;
         }
         
-      [HttpGet]
-        [Route("[action]")]
-        [ProducesResponseType(typeof(IList<LibroParaResenarDTO>), (int) HttpStatusCode.OK)]
-        public async Task<ActionResult> GetLibrosParaResenar()
-        {
-        
-            var libros = await _context.Libros
-                .Select(l => new LibroParaResenarDTO
-                {
-                    Id = l.Id,
-                    Titulo = l.Titulo
-                })
-                .ToListAsync();
+        //Controlador para obtener los libros disponibles para reseñar, devolviendo un DTO con los atributos relevantes para la reseña.
+ [HttpGet]
+[Route("[action]")]
+[ProducesResponseType(typeof(IList<LibroParaResenarDTO>), (int) HttpStatusCode.OK)]
+public async Task<ActionResult> GetLibrosParaResenar(string? titulo, string? tipoLibro, string? genero)
+{
+    var libros = await _context.Libros
+        .Include(l => l.Genero)
+        .Include(l => l.Editorial)
+        // Usamos Contains() para búsquedas parciales
+        .Where(l => (string.IsNullOrEmpty(titulo) || l.Titulo.Contains(titulo))
+                 && (string.IsNullOrEmpty(tipoLibro) || l.TipoLibro.Contains(tipoLibro)) 
+                 && (string.IsNullOrEmpty(genero) || (l.Genero != null && l.Genero.Nombre.Contains(genero))))
+        .Select(l => new LibroParaResenarDTO(
+            l.Id,
+            l.Titulo,
+            l.TipoLibro,
+            l.Genero != null ? l.Genero.Nombre : string.Empty,
+            l.Editorial != null ? l.Editorial.Nombre : string.Empty,
+            l.Autor,
+            l.CalificacionMedia,
+            l.FechaLanzamiento
+        ))
+        .ToListAsync();
 
-            return Ok(libros);
-        }
-
+    return Ok(libros);
+}
 
         //Controlador para obtener los libros disponibles para comprar, devolviendo un DTO con los atributos relevantes para la compra.
     [HttpGet]

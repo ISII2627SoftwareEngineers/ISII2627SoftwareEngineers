@@ -207,6 +207,15 @@ namespace AppForSEII.API.Migrations
                     b.Property<int>("GeneroId")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("PrecioCompra")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PrecioReposicion")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Stock")
+                        .HasColumnType("int");
+
                     b.Property<string>("TipoLibro")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -509,8 +518,9 @@ namespace AppForSEII.API.Migrations
                     b.Property<DateTime>("FechaCaducidad")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("NumeroTarjeta")
-                        .HasColumnType("int");
+                    b.Property<string>("NumeroTarjeta")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("Visa");
                 });

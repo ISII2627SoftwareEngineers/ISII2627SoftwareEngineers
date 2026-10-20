@@ -39,7 +39,7 @@ namespace AppForSEII.API.Controllers
 
 
         //Controlador para obtener los libros disponibles para comprar, devolviendo un DTO con los atributos relevantes para la compra.
-        [HttpGet]
+    [HttpGet]
         [Route("[action]")]
         [ProducesResponseType(typeof(IList<LibroParaComprarDTO>), (int)HttpStatusCode.OK)]
         public async Task<ActionResult> GetLibrosParaComprar()
@@ -47,12 +47,12 @@ namespace AppForSEII.API.Controllers
             var libros = await _context.Libros
                 .Include(l => l.Genero)
                 .Include(l => l.Editorial)
+                .Where(l => l.Stock > 0) // Filtro según especificación del CU1:Comprar Libros (stock > 0)
                 .Select(l => new LibroParaComprarDTO(
                     l.Id,
                     l.Titulo,
-                    l.Autor,
-                    l.TipoLibro,
-                    l.CalificacionMedia,
+                    l.PrecioCompra,
+                    l.FechaLanzamiento,
                     l.Genero != null ? l.Genero.Nombre : string.Empty,
                     l.Editorial != null ? l.Editorial.Nombre : string.Empty
                 ))

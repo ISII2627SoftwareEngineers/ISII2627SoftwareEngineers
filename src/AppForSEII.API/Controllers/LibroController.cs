@@ -48,28 +48,32 @@ public async Task<ActionResult> GetLibrosParaResenar(string? titulo, string? tip
     return Ok(libros);
 }
 
-        //Controlador para obtener los libros disponibles para comprar, devolviendo un DTO con los atributos relevantes para la compra.
-    [HttpGet]
-        [Route("[action]")]
-        [ProducesResponseType(typeof(IList<LibroParaComprarDTO>), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult> GetLibrosParaComprar()
-        {
-            var libros = await _context.Libros
-                .Include(l => l.Genero)
-                .Include(l => l.Editorial)
-                .Where(l => l.Stock > 0) // Filtro según especificación del CU1:Comprar Libros (stock > 0)
-                .Select(l => new LibroParaComprarDTO(
-                    l.Id,
-                    l.Titulo,
-                    l.PrecioCompra,
-                    l.FechaLanzamiento,
-                    l.Genero != null ? l.Genero.Nombre : string.Empty,
-                    l.Editorial != null ? l.Editorial.Nombre : string.Empty
-                ))
-                .ToListAsync();
+        //Controlador para obtener los libros disponibles para comprar (stock > 0), devolviendo un DTO con los atributos relevantes para la compra.
+        //permitiendo filtrar opcionalmente por género y precio según el flujo alternativo.
+    
+[HttpGet]
+[Route("[action]")]
+[ProducesResponseType(typeof(IList<LibroParaComprarDTO>), (int)HttpStatusCode.OK)]
+public async Task<ActionResult> GetLibrosParaComprar(string? genero, decimal? precio)
+{
+    var libros = await _context.Libros
+        .Include(l => l.Genero)
+        .Include(l => l.Editorial)
+        .Where(l => l.Stock > 0 // Requisito obligatorio: stock > 0 según el flujo
+                 && (string.IsNullOrEmpty(genero) || (l.Genero != null && l.Genero.Nombre.Contains(genero)))
+                 && (!precio.HasValue || l.PrecioCompra <= precio.Value))
+        .Select(l => new LibroParaComprarDTO(
+            l.Id,
+            l.Titulo,
+            l.PrecioCompra,
+            l.FechaLanzamiento,
+            l.Genero != null ? l.Genero.Nombre : string.Empty,
+            l.Editorial != null ? l.Editorial.Nombre : string.Empty
+        ))
+        .ToListAsync();
 
-            return Ok(libros);
-        }
+    return Ok(libros);
+}
 
     [HttpGet]
         [Route("[action]")]

@@ -59,7 +59,7 @@ public async Task<ActionResult> GetLibrosParaComprar(string? genero, decimal? pr
     var libros = await _context.Libros
         .Include(l => l.Genero)
         .Include(l => l.Editorial)
-        .Where(l => l.Stock > 0 // Requisito obligatorio: stock > 0 según el flujo
+        .Where(l => l.Stock > 0 // Requisito obligatorio: stock > 0 según el flujo.
                  && (string.IsNullOrEmpty(genero) || (l.Genero != null && l.Genero.Nombre.Contains(genero)))
                  && (!precio.HasValue || l.PrecioCompra <= precio.Value))
         .Select(l => new LibroParaComprarDTO(

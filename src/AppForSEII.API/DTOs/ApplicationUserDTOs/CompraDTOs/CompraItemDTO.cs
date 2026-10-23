@@ -18,7 +18,7 @@ namespace AppForSEII.API.DTOs.CompraDTOs
 
         public string Genero { get; set; } 
 
-        public string Editorial { get; set; } 
+        public string Editorial { get; set; }
 
         // Compara si dos objetos CompraItemDTO son iguales
         public override bool Equals(object? obj)
@@ -30,10 +30,12 @@ namespace AppForSEII.API.DTOs.CompraDTOs
                    Editorial == dTO.Editorial;
         }
 
-        
         public override int GetHashCode()
         {
             return HashCode.Combine(LibroID, Titulo, Genero, Editorial);
         }
+
+        
+
     }
 }

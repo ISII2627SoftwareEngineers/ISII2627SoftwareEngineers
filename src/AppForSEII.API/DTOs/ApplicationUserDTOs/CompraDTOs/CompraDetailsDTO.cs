@@ -2,48 +2,67 @@ using AppForSEII.API.DTOs;
 
 namespace AppForSEII.API.DTOs.CompraDTOs
 {
-    // DTO para mostrar los detalles completos de una compra
-    /*
-    NOTA: La palabra base en C# se usa para comunicarse con la clase padre de la que estoy heredando (en este caso, CompraForCreateDTO)
-    En este caso, CompraDetailDTO hereda de CompraForCreateDTO, lo que significa que CompraDetailDTO tiene todas las propiedades y métodos de CompraForCreateDTO, además de sus propias propiedades y métodos.
-    Cuando creo los detalles de una compra, necesito rellenar tanto los datos nuevos (Id y Fecha) como los datos heredados.
-    Por eso, en el constructor de CompraDetailDTO, llamo a base(...) para pasar los datos que son necesarios para inicializar la clase padre (CompraForCreateDTO).
-
-    
-    */
-    public class CompraDetailDTO : CompraForCreateDTO
+    // DTO para mostrar los detalles completos de una compra de forma independiente
+    public class CompraDetailDTO
     {
-        // Constructor que recibe todos los datos de la compra y los pasa al padre
-        public CompraDetailDTO(int id, DateTime fecha, string nombre, string apellidos,
-            string direccion, string telefono, string metodoPago, string? codigoDescuento,
-            decimal precioTotal, IList<CompraItemDTO> compraItems)
-            : base(nombre, apellidos, direccion, telefono, metodoPago, codigoDescuento, precioTotal, compraItems)
+      
+        // Constructor que inicializa directamente todas las propiedades de la clase
+        public CompraDetailDTO(int id, string nombre, string apellidos, string direccion, string telefono, DateTime fecha, decimal precioTotal, string metodoPago, string? codigoDescuento, IList<CompraItemDTO> compraItems)
         {
-            Id = id;            
-            Fecha = fecha;      
-            PrecioTotal = precioTotal; 
+            Id = id;
+            Nombre = nombre;
+            Apellidos = apellidos;
+            Direccion = direccion;
+            Telefono = telefono;
+            Fecha = fecha;
+            PrecioTotal = precioTotal;
+            MetodoPago = metodoPago;
+            CodigoDescuento = codigoDescuento;
+            CompraItems = compraItems ?? new List<CompraItemDTO>(); // Inicializamos la lista de libros comprados, asegurándonos de que nunca sea nula
         }
+        
 
         public int Id { get; set; } // Identificador único
-
+        public string Nombre { get; set; }
+        public string Apellidos { get; set; }
+        public string Direccion { get; set; }
+        public string Telefono { get; set; }
         public DateTime Fecha { get; set; } // Fecha en la que se hizo la compra
-
         public decimal PrecioTotal { get; set; } // Precio total de la compra
+        public string MetodoPago { get; set; }
+        public string? CodigoDescuento { get; set; } //código opcional segun flujo basico
+        public IList<CompraItemDTO> CompraItems { get; set; }
 
         // Compara si dos objetos CompraDetailDTO son iguales
         public override bool Equals(object? obj)
         {
             return obj is CompraDetailDTO dTO &&
-                   base.Equals(obj) &&
                    Id == dTO.Id &&
+                   Nombre == dTO.Nombre &&
+                   Apellidos == dTO.Apellidos &&
+                   Direccion == dTO.Direccion &&
+                   Telefono == dTO.Telefono &&
+                   Fecha == dTO.Fecha &&
                    PrecioTotal == dTO.PrecioTotal &&
-                   Fecha == dTO.Fecha;
+                   MetodoPago == dTO.MetodoPago &&
+                   CodigoDescuento == dTO.CodigoDescuento &&
+                   EqualityComparer<IList<CompraItemDTO>>.Default.Equals(CompraItems, dTO.CompraItems);
         }
-
-        
+        // Genera un código hash único para el objeto CompraDetailDTO(lo pone asi y no en una linea porque no acepta mas de 9 argumentos)
         public override int GetHashCode()
         {
-            return HashCode.Combine(base.GetHashCode(), Id, Fecha, PrecioTotal);
+            HashCode hash = new HashCode();
+            hash.Add(Id);
+            hash.Add(Nombre);
+            hash.Add(Apellidos);
+            hash.Add(Direccion);
+            hash.Add(Telefono);
+            hash.Add(Fecha);
+            hash.Add(PrecioTotal);
+            hash.Add(MetodoPago);
+            hash.Add(CodigoDescuento);
+            hash.Add(CompraItems);
+            return hash.ToHashCode();
         }
     }
 }

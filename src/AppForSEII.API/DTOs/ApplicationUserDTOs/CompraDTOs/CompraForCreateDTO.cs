@@ -27,7 +27,7 @@ namespace AppForSEII.API.DTOs.CompraDTOs
             CompraItems = compraItems ?? throw new ArgumentNullException(nameof(compraItems));
         }
 
-        // Constructor vacío necesario para que funcione la deserialización automática
+        
         public CompraForCreateDTO()
         {
             CompraItems = new List<CompraItemDTO>();
@@ -46,7 +46,7 @@ namespace AppForSEII.API.DTOs.CompraDTOs
         public string Telefono { get; set; } 
 
         [Required(ErrorMessage = "Por favor, introduce el método de pago")]
-        public string MetodoPago { get; set; } // Método de pago elegido
+        public string? MetodoPago { get; set; } // Método de pago elegido
 
         public string? CodigoDescuento { get; set; } // Código de descuento opcional(segun flujo alternativo)
 

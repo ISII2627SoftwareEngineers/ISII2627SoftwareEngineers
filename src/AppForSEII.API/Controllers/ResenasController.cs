@@ -33,8 +33,8 @@ namespace AppForSEII.API.Controllers
                         .ThenInclude(l => l.Editorial) // Join a la tabla Editorial para el nombre de la editorial
                 .Select(r => new ResenaDetailDTO(
                     r.Id,
-                    r.Usuario != null ? (r.Usuario.Name ?? string.Empty) : string.Empty,
-                    r.Usuario != null ? (r.Usuario.Surname ?? string.Empty) : string.Empty,
+                    r.Usuario != null ? (r.Usuario.Nombre ?? string.Empty) : string.Empty,
+                    r.Usuario != null ? (r.Usuario.Apellidos ?? string.Empty) : string.Empty,
                     r.Usuario != null ? (r.Usuario.PhoneNumber ?? string.Empty) : string.Empty,
                     r.FechaResena,
                     r.ResenaItems.Select(ri => new ResenaItemDTO(

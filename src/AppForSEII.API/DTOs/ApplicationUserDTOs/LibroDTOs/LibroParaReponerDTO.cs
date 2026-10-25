@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace AppForSEII.API.DTOs.LibroDTOs;
@@ -12,14 +13,21 @@ public class LibroParaReponerDTO
 
     public string Genero { get; set; }
 
-    public string Editorial { get; set; }
+    public string Autor { get; set; }
 
-    public LibroParaReponerDTO(int id, string titulo, string genero, string editorial)
+    public DateTime FechaLanzamiento { get; set; }
+
+    public decimal PrecioReposicion { get; set; }
+
+    // Constructor para proyectar los campos fácilmente desde LINQ (.Select)
+    public LibroParaReponerDTO(int id, string titulo, string genero, string autor, DateTime fechaLanzamiento, decimal precioReposicion)
     {
         Id = id;
         Titulo = titulo;
         Genero = genero;
-        Editorial = editorial;
+        Autor = autor;
+        FechaLanzamiento = fechaLanzamiento;
+        PrecioReposicion = precioReposicion;
     }
 
     // Constructor vacío obligatorio para la serialización JSON
@@ -32,12 +40,14 @@ public class LibroParaReponerDTO
                Id == dto.Id &&
                Titulo == dto.Titulo &&
                Genero == dto.Genero &&
-               Editorial == dto.Editorial;
+               Autor == dto.Autor &&
+               FechaLanzamiento == dto.FechaLanzamiento &&
+               PrecioReposicion == dto.PrecioReposicion;
     }
 
     // Al sobrescribir Equals es necesario sobrescribir GetHashCode
     public override int GetHashCode()
     {
-        return HashCode.Combine(Id, Titulo, Genero, Editorial);
+        return HashCode.Combine(Id, Titulo, Genero, Autor, FechaLanzamiento, PrecioReposicion);
     }
 }

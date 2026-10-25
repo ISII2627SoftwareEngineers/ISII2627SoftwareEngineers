@@ -75,26 +75,37 @@ public async Task<ActionResult> GetLibrosParaComprar(string? genero, decimal? pr
     return Ok(libros);
 }
 
-    [HttpGet]
-        [Route("[action]")]
-        [ProducesResponseType(typeof(IList<LibroParaReponerDTO>), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult> GetLibrosParaReponer(string? titulo, string? genero)
-        {
-            var libros = await _context.Libros
-                .Include(l => l.Genero)
-                .Include(l => l.Editorial)
-                .Where(l => (titulo == null || l.Titulo.Contains(titulo)) 
-                         && (genero == null || (l.Genero != null && l.Genero.Nombre.Equals(genero))))
-                .Select(l => new LibroParaReponerDTO(
-                    l.Id,
-                    l.Titulo,
-                    l.Genero != null ? l.Genero.Nombre : string.Empty,
-                    l.Editorial != null ? l.Editorial.Nombre : string.Empty
-                ))
-                .ToListAsync();
+[HttpGet]
+[Route("[action]")]
+[ProducesResponseType(typeof(IList<LibroParaReponerDTO>), (int)HttpStatusCode.OK)]
+public async Task<ActionResult> GetLibrosParaReponer(
+    string? titulo, 
+    string? genero, 
+    string? autor, 
+    DateTime? fechaLanzamiento, 
+    decimal? precioReposicion) // <-- Añadido como parámetro de búsqueda opcional
+{
+    var libros = await _context.Libros
+        .Include(l => l.Genero)
+        .Include(l => l.Editorial)
+        .Where(l => l.Stock == 0 // Filtro de stock = 0 según el enunciado
+                 && (titulo == null || l.Titulo.Contains(titulo)) 
+                 && (genero == null || (l.Genero != null && l.Genero.Nombre.Equals(genero)))
+                 && (autor == null || l.Autor.Contains(autor))
+                 && (fechaLanzamiento == null || l.FechaLanzamiento.Date == fechaLanzamiento.Value.Date)
+                 && (precioReposicion == null || l.PrecioReposicion == precioReposicion)) // <-- Filtro de búsqueda por precio
+        .Select(l => new LibroParaReponerDTO(
+            l.Id,
+            l.Titulo,
+            l.Genero != null ? l.Genero.Nombre : string.Empty,
+            l.Autor,
+            l.FechaLanzamiento,
+            l.PrecioReposicion // <-- Propiedad mostrada en el DTO
+        ))
+        .ToListAsync();
 
-            return Ok(libros);
-        }
+    return Ok(libros);
+}
     }
 
 

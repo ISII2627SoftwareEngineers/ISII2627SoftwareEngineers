@@ -38,6 +38,18 @@ namespace AppForSEII.API.Data {
                 logger.LogError(ex, "An error occurred seeding the Reviews (Resenas) in the Database.");
             }
 
+             try {
+                var user = dbContext.Users.OfType<ApplicationUser>().FirstOrDefault(u => u.UserName == "elena@uclm.es");
+
+                if (user == null) 
+                logger.LogError("An error occurred seeding Reposiciones in the Database: user does not exist");
+                else
+                SeedReposiciones(dbContext, user);
+                }
+            catch (Exception ex) {
+                logger.LogError(ex, "An error occurred seeding the Reposiciones in the Database.");
+            }
+
             try {
                  var user = dbContext.Users.OfType<ApplicationUser>().FirstOrDefault(u => u.UserName == "peter@uclm.es");
 
@@ -50,17 +62,7 @@ namespace AppForSEII.API.Data {
                 logger.LogError(ex, "An error occurred seeding the Purchases (Compras) in the Database.");
             }
 
-            try {
-                var user = dbContext.Users.OfType<ApplicationUser>().FirstOrDefault(u => u.UserName == "elena@uclm.es");
 
-                if (user == null) 
-                logger.LogError("An error occurred seeding Reposiciones in the Database: user does not exist");
-                else
-                SeedReposiciones(dbContext, user);
-                }
-            catch (Exception ex) {
-                logger.LogError(ex, "An error occurred seeding the Reposiciones in the Database.");
-            }
 
         }
 
@@ -256,14 +258,25 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
         if (!dbContext.Compras.Any()) {
             
 
-        
+            // cargo los metodos de pago que ya existen en la BD por su Id
+            // 1 = GooglePay, 2 = PayPal, 3 = Visa
+
+            // 1. Buscamos en la base de datos el primer registro guardado de cada tipo de pago (GooglePay, PayPal y Visa)
+            var metodoPago1 = dbContext.Set<MetodoPago>().OfType<GooglePay>().FirstOrDefault();
+            var metodoPago2 = dbContext.Set<MetodoPago>().OfType<PayPal>().FirstOrDefault();   
+            var metodoPago3 = dbContext.Set<MetodoPago>().OfType<Visa>().FirstOrDefault();
+
+            // 2. Comprobamos que existan los tres; si falta cualquiera de ellos, lanzamos una excepción para avisar del error
+            if (metodoPago1 == null || metodoPago2 == null || metodoPago3 == null)
+                throw new InvalidOperationException("Los metodos de pago 1, 2 y 3 no existen todavia.");
+
 
             //Compras asociadas a los metodos de pago
             var compra1 = new Compra {
                 FechaCompra = new DateTime(2023, 10, 15).ToUniversalTime(),
                 PrecioTotal = 30.0,
                 CodigoDescuento = "DESC10", // Entre 5 y 10 caracteres
-                MetodoPago = null, 
+                MetodoPago = metodoPago1, //GooglePay 
                 Usuario = user,
                 CompraItems = new List<CompraItem>()
             };
@@ -274,7 +287,7 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
                 FechaCompra = new DateTime(2023, 11, 20).ToUniversalTime(),
                 PrecioTotal = 45.0,
                 CodigoDescuento = "PROMO5",
-                MetodoPago = null, 
+                MetodoPago = metodoPago2, //Paypal 
                 Usuario = user,
                 CompraItems = new List<CompraItem>()
             };
@@ -285,7 +298,7 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
                 FechaCompra = new DateTime(2024, 1, 10).ToUniversalTime(),
                 PrecioTotal = 20.0,
                 CodigoDescuento = "OFERTA",
-                MetodoPago = null, 
+                MetodoPago = metodoPago3, //Visa 
                 Usuario = user,
                 CompraItems = new List<CompraItem>()
             };
@@ -296,7 +309,7 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
                 FechaCompra = new DateTime(2024, 2, 5).ToUniversalTime(),
                 PrecioTotal = 60.0,
                 CodigoDescuento = "VERANO",
-                MetodoPago = null,
+                MetodoPago = metodoPago1, //GooglePay
                 Usuario = user,
                 CompraItems = new List<CompraItem>()
             };

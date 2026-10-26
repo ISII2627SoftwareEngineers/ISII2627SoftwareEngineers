@@ -247,15 +247,25 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
         // 1. Insertar 4 filas/tuplas de Compra con sus respectivos CompraItem
         if (!dbContext.Compras.Any()) {
             
+            // ID 1: GooglePay
+            var metodoPagoGooglePay = new GooglePay("chipi@uclm.es");
 
-        
+            // ID 2: PayPal
+            var metodoPagoPayPal = new PayPal("655322368");
+
+            // ID 3: Visa
+            var metodoPagoVisa = new Visa("12345678", new DateTime(2028, 12, 31).ToUniversalTime());
+
+            // ID 1: GooglePay
+            var metodoPagoGooglePay4 = new GooglePay("otrocorreo@uclm.es");
+
 
             //Compras asociadas a los metodos de pago
             var compra1 = new Compra {
                 FechaCompra = new DateTime(2023, 10, 15).ToUniversalTime(),
                 PrecioTotal = 30.0,
                 CodigoDescuento = "DESC10", // Entre 5 y 10 caracteres
-                MetodoPago = null, 
+                MetodoPago = metodoPagoGooglePay, 
                 Usuario = user,
                 CompraItems = new List<CompraItem>()
             };
@@ -266,7 +276,7 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
                 FechaCompra = new DateTime(2023, 11, 20).ToUniversalTime(),
                 PrecioTotal = 45.0,
                 CodigoDescuento = "PROMO5",
-                MetodoPago = null, 
+                MetodoPago = metodoPagoPayPal, 
                 Usuario = user,
                 CompraItems = new List<CompraItem>()
             };
@@ -277,7 +287,7 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
                 FechaCompra = new DateTime(2024, 1, 10).ToUniversalTime(),
                 PrecioTotal = 20.0,
                 CodigoDescuento = "OFERTA",
-                MetodoPago = null, 
+                MetodoPago = metodoPagoVisa, 
                 Usuario = user,
                 CompraItems = new List<CompraItem>()
             };
@@ -288,7 +298,7 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
                 FechaCompra = new DateTime(2024, 2, 5).ToUniversalTime(),
                 PrecioTotal = 60.0,
                 CodigoDescuento = "VERANO",
-                MetodoPago = null,
+                MetodoPago = metodoPagoGooglePay4,
                 Usuario = user,
                 CompraItems = new List<CompraItem>()
             };

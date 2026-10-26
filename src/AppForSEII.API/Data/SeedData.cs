@@ -260,11 +260,14 @@ public static void SeedResenas(ApplicationDbContext dbcontext, ApplicationUser u
 
             // cargo los metodos de pago que ya existen en la BD por su Id
             // 1 = GooglePay, 2 = PayPal, 3 = Visa
+
+            // 1. Buscamos en la base de datos el primer registro guardado de cada tipo de pago (GooglePay, PayPal y Visa)
             var metodoPago1 = dbContext.Set<MetodoPago>().OfType<GooglePay>().FirstOrDefault();
             var metodoPago2 = dbContext.Set<MetodoPago>().OfType<PayPal>().FirstOrDefault();   
             var metodoPago3 = dbContext.Set<MetodoPago>().OfType<Visa>().FirstOrDefault();
 
-                if (metodoPago1 == null || metodoPago2 == null || metodoPago3 == null)
+            // 2. Comprobamos que existan los tres; si falta cualquiera de ellos, lanzamos una excepción para avisar del error
+            if (metodoPago1 == null || metodoPago2 == null || metodoPago3 == null)
                 throw new InvalidOperationException("Los metodos de pago 1, 2 y 3 no existen todavia.");
 
 

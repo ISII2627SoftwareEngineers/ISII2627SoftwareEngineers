@@ -79,38 +79,46 @@ namespace AppForSEII.API.Data {
         }
 
         public static void SeedUsers(UserManager<ApplicationUser> userManager, List<string> roles) {
-            //first, it checks the user does not already exist in the DB
-            if (userManager.FindByNameAsync("elena@uclm.es").Result == null) {
-                ApplicationUser user = new ApplicationUser("1", "Elena", "Navarro Martínez", "elena@uclm.es");
-                user.EmailConfirmed = true;
+    if (userManager.FindByNameAsync("elena@uclm.es").Result == null) {
+        ApplicationUser user = new ApplicationUser 
+        {
+            UserName = "elena@uclm.es",
+            Email = "elena@uclm.es",
+            Nombre = "Elena",
+            Apellidos = "Navarro Martínez",
+            Direccion = "Dirección de Elena",
+            PhoneNumber = "600123456",
+            EmailConfirmed = true
+        };
 
-                var result = userManager.CreateAsync(user, "Password1234%");
-                result.Wait();
+        var resultTask = userManager.CreateAsync(user, "Password1234%");
+        resultTask.Wait();
 
-                if (result.IsCompletedSuccessfully) {
-                    //administrator role
-                    userManager.AddToRoleAsync(user, roles[0]).Wait();
-                }
-            }
-
-
-            if (userManager.FindByNameAsync("peter@uclm.es").Result == null) {
-                //A customer class has been defined because it has different attributes (purchase, rental, etc.)
-                ApplicationUser user = new ApplicationUser("3", "Peter", "Jackson", "peter@uclm.es");
-                user.EmailConfirmed = true;
-
-                var result = userManager.CreateAsync(user, "OtherPass12$");
-
-                result.Wait();
-
-                if (result.IsCompletedSuccessfully) {
-                    //customer role
-                    userManager.AddToRoleAsync(user, roles[2]).Wait();
-
-                }
-            }
-
+        if (resultTask.Result.Succeeded) {
+            userManager.AddToRoleAsync(user, roles[0]).Wait();
         }
+    }
+
+    if (userManager.FindByNameAsync("peter@uclm.es").Result == null) {
+        ApplicationUser user = new ApplicationUser 
+        {
+            UserName = "peter@uclm.es",
+            Email = "peter@uclm.es",
+            Nombre = "Peter",
+            Apellidos = "Jackson",
+            Direccion = "Dirección de Peter",
+            PhoneNumber = "600654321",
+            EmailConfirmed = true
+        };
+
+        var resultTask = userManager.CreateAsync(user, "OtherPass12$");
+        resultTask.Wait();
+
+        if (resultTask.Result.Succeeded) {
+            userManager.AddToRoleAsync(user, roles[2]).Wait();
+        }
+    }
+}
 
 public static void SeedGenerosEditorialesYLibros(ApplicationDbContext dbContext) {
             string[] nombresGeneros = ["Fantasia", "Ciencia Ficcion", "Terror"];

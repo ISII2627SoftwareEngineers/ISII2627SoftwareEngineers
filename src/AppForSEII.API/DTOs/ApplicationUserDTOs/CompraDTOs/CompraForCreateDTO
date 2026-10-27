@@ -5,6 +5,7 @@ namespace AppForSEII.API.DTOs
 {
     public class CompraForCreateDTO
     {
+        // Constructor que inicializa la lista de elementos de compra para evitar errores de nulos (NullReferenceException)
         public CompraForCreateDTO()
         {
             CompraItems = new List<CompraItemDTO>();
@@ -25,7 +26,7 @@ namespace AppForSEII.API.DTOs
         public string Apellidos { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "La dirección es obligatoria")]
-        [StringLength(100, MinimumLength = 10, ErrorMessage = "La dirección debe tener al menos 10 caracteres")]
+        
         public string Direccion { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "El teléfono es obligatorio")]
@@ -37,23 +38,39 @@ namespace AppForSEII.API.DTOs
         [StringLength(10, MinimumLength = 5, ErrorMessage = "El código de descuento debe tener entre 5 y 10 caracteres")]
         public string? CodigoDescuento { get; set; } //opcional segun el parrafo 5 del flujo básico
 
-
+        // Lista de libros o elementos que el usuario ha seleccionado para comprar
         public IList<CompraItemDTO> CompraItems { get; set; }
 
+
+        // Propiedad calculada: Calcula de forma automática el precio total de la compra en tiempo real
         [Display(Name = "Precio Total")]
         [JsonPropertyName("PrecioTotal")]
         public double PrecioTotal
         {
             get
             {
+                // LINQ .Sum(): Recorre cada ítem (ci), multiplica su precio por la cantidad y suma todos los subtotales
                 return CompraItems.Sum(ci => ci.PrecioCompra * ci.Cantidad); //ci==compra item
             }
         }
     }
 }
 
+
+
+
+
+/*Explicacion
+
+[Display(Name = "Precio Total")]: Sirve para que en la interfaz visual de Swagger el campo aparezca con un nombre bonito y legible (con espacio: "Precio Total").
+
+[JsonPropertyName("PrecioTotal")]: Obliga a que en el código JSON que se envía y recibe la API, la clave se escriba exactamente así ("PrecioTotal").
+
+El cálculo automático (get con LINQ): Es como una calculadora interna. Cada vez que el sistema necesita saber el precio, coge la lista de libros, multiplica la cantidad de cada uno por su precio unitario, los suma todos de golpe y te devuelve el precio final al instante.
+*/
+
 /*
-Explicación del:
+Explicación mas detallada del:
 return CompraItems.Sum(ci => ci.PrecioCompra * ci.Cantidad);
 
 .Sum() es una función de LINQ en C# que recorre toda la lista de elementos (CompraItems), 

@@ -3,9 +3,14 @@ namespace AppForSEII.API.DTOs.CompraDTOs
     // DTO para representar cada libro de manera individual dentro de la lista de la compra
     public class CompraItemDTO
     {
+        
+        public CompraItemDTO() { // constructor vacío para que el JSON se pueda leer
+
+        }   
+
         //Constructor que recibe los datos principales del libro comprado
 
-        //constructor para post (añadiendo Genero y Editorial)
+        //constructor para post (añadiendo Cantidad y PrecioCompra)
         public CompraItemDTO(int libroID, string titulo, string genero, string editorial, int cantidad, double precioCompra)
         {
             LibroID = libroID;     
@@ -16,7 +21,7 @@ namespace AppForSEII.API.DTOs.CompraDTOs
             PrecioCompra= precioCompra;
         }
 
-        //constructor para detail (sin  Genero y sin Editorial)
+        //constructor para detail (sin Cantidad ni PrecioCompra)
         public CompraItemDTO(int libroID, string titulo, string genero, string editorial)
         {
             LibroID = libroID;     

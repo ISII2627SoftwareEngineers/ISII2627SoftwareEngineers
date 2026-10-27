@@ -1,0 +1,72 @@
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+
+namespace AppForSEII.API.DTOs
+{
+    public class CompraForCreateDTO
+    {
+        public CompraForCreateDTO()
+        {
+            CompraItems = new List<CompraItemDTO>();
+        }
+
+        /*
+        El UsuarioUserName es necesario en el DTO para que la API pueda identificar en la base de datos 
+        al cliente que realiza la compra y asociarla correctamente a su cuenta
+        */
+        [EmailAddress(ErrorMessage = "El formato del usuario debe ser un correo electrónico válido")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Por favor, establece el usuario (email)")]
+        public string UsuarioUserName { get; set; } = "persona@uclm.es";
+
+        [Required(ErrorMessage = "El nombre es obligatorio")]
+        public string Nombre { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Los apellidos son obligatorios")]
+        public string Apellidos { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La dirección es obligatoria")]
+        [StringLength(100, MinimumLength = 10, ErrorMessage = "La dirección debe tener al menos 10 caracteres")]
+        public string Direccion { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El teléfono es obligatorio")]
+        public string Telefono { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El método de pago es obligatorio")]
+        public PaymentMethodTypes MetodoDePago { get; set; }
+
+        [StringLength(10, MinimumLength = 5, ErrorMessage = "El código de descuento debe tener entre 5 y 10 caracteres")]
+        public string? CodigoDescuento { get; set; } //opcional segun el parrafo 5 del flujo básico
+
+
+        public IList<CompraItemDTO> CompraItems { get; set; }
+
+        [Display(Name = "Precio Total")]
+        [JsonPropertyName("PrecioTotal")]
+        public double PrecioTotal
+        {
+            get
+            {
+                return CompraItems.Sum(ci => ci.PrecioCompra * ci.Cantidad); //ci==compra item
+            }
+        }
+    }
+}
+
+/*
+Explicación del:
+return CompraItems.Sum(ci => ci.PrecioCompra * ci.Cantidad);
+
+.Sum() es una función de LINQ en C# que recorre toda la lista de elementos (CompraItems), 
+ejecuta la operación matemática que le indiques dentro de los paréntesis para cada elemento, 
+y al final suma todos los resultados obtenidos
+
+1º: cada libro de la lista ci, multiplica su precio unitario(PrecioCompra) por las unidades 
+    que el usuario quiere comprar(Cantidad). Y esto da el subtotal de ese libro concreto
+
+2º: sumo todos los subtotales de todos los libros que están en la lista de la compra
+
+3º: devuelve el precio total de toda la compra
+
+
+
+*/

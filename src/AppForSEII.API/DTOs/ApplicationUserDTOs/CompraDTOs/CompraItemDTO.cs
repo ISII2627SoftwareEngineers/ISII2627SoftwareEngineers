@@ -4,13 +4,14 @@ namespace AppForSEII.API.DTOs.CompraDTOs
     public class CompraItemDTO
     {
         // Constructor que recibe los datos principales del libro comprado
-        public CompraItemDTO(int libroID, string titulo, string genero, string editorial, int cantidad)
+        public CompraItemDTO(int libroID, string titulo, string genero, string editorial, int cantidad, double precioCompra)
         {
             LibroID = libroID;     
             Titulo = titulo;       
             Genero = genero;       
             Editorial = editorial; 
             Cantidad= cantidad;
+            PrecioCompra= precioCompra;
         }
 
         public int LibroID { get; set; } 
@@ -25,6 +26,7 @@ namespace AppForSEII.API.DTOs.CompraDTOs
         [Range(2, int.MaxValue, ErrorMessage = "La cantidad de compra debe ser mayor que 1")]
         public int Cantidad { get; set; }
 
+        public double PrecioCompra { get; set; }
         // Compara si dos objetos CompraItemDTO son iguales
         public override bool Equals(object? obj)
         {
@@ -33,12 +35,13 @@ namespace AppForSEII.API.DTOs.CompraDTOs
                    Titulo == dTO.Titulo &&
                    Genero == dTO.Genero &&
                    Editorial == dTO.Editorial &&
-                   Cantidad ==dTO.Cantidad;
+                   Cantidad ==dTO.Cantidad &&
+                   PrecioCompra== dTO.PrecioCompra;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(LibroID, Titulo, Genero, Editorial, Cantidad);
+            return HashCode.Combine(LibroID, Titulo, Genero, Editorial, Cantidad, PrecioCompra);
         }
 
         

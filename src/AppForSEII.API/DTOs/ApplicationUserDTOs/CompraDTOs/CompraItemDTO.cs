@@ -35,8 +35,10 @@ namespace AppForSEII.API.DTOs.CompraDTOs
 
         [Required(ErrorMessage = "La cantidad es obligatoria")]
         [Range(2, int.MaxValue, ErrorMessage = "La cantidad de compra debe ser mayor que 1")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] //Oculta del JSON si vale 0
         public int Cantidad { get; set; }
 
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]//Oculta del JSON si vale 0
         public double PrecioCompra { get; set; }
         // Compara si dos objetos CompraItemDTO son iguales
         public override bool Equals(object? obj)

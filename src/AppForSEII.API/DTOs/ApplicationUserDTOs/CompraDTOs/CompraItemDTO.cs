@@ -3,13 +3,32 @@ namespace AppForSEII.API.DTOs.CompraDTOs
     // DTO para representar cada libro de manera individual dentro de la lista de la compra
     public class CompraItemDTO
     {
-        // Constructor que recibe los datos principales del libro comprado
+        
+        public CompraItemDTO() { // constructor vacío para que el JSON se pueda leer
+
+        }   
+
+        //Constructor que recibe los datos principales del libro comprado
+
+        //constructor para post (añadiendo Cantidad y PrecioCompra)
+        public CompraItemDTO(int libroID, string titulo, string genero, string editorial, int cantidad, double precioCompra)
+        {
+            LibroID = libroID;     
+            Titulo = titulo;       
+            Genero = genero;       
+            Editorial = editorial; 
+            Cantidad= cantidad;
+            PrecioCompra= precioCompra;
+        }
+
+        //constructor para detail (sin Cantidad ni PrecioCompra)
         public CompraItemDTO(int libroID, string titulo, string genero, string editorial)
         {
             LibroID = libroID;     
             Titulo = titulo;       
             Genero = genero;       
             Editorial = editorial; 
+            
         }
 
         public int LibroID { get; set; } 
@@ -20,6 +39,13 @@ namespace AppForSEII.API.DTOs.CompraDTOs
 
         public string Editorial { get; set; }
 
+        [Required(ErrorMessage = "La cantidad es obligatoria")]
+        [Range(2, int.MaxValue, ErrorMessage = "La cantidad de compra debe ser mayor que 1")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] //La etiqueta oculta esa propiedad del JSON de respuesta cuando su valor es el por defecto (por ejemplo 0 en este caso)
+        public int Cantidad { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]//La etiqueta oculta esa propiedad del JSON de respuesta cuando su valor es el por defecto (por ejemplo 0 en este caso)
+        public double PrecioCompra { get; set; }
         // Compara si dos objetos CompraItemDTO son iguales
         public override bool Equals(object? obj)
         {
@@ -27,12 +53,14 @@ namespace AppForSEII.API.DTOs.CompraDTOs
                    LibroID == dTO.LibroID &&
                    Titulo == dTO.Titulo &&
                    Genero == dTO.Genero &&
-                   Editorial == dTO.Editorial;
+                   Editorial == dTO.Editorial &&
+                   Cantidad ==dTO.Cantidad &&
+                   PrecioCompra== dTO.PrecioCompra;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(LibroID, Titulo, Genero, Editorial);
+            return HashCode.Combine(LibroID, Titulo, Genero, Editorial, Cantidad, PrecioCompra);
         }
 
         

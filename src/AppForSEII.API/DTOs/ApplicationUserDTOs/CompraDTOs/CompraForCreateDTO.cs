@@ -1,0 +1,85 @@
+
+namespace AppForSEII.API.DTOs.CompraDTOs
+{
+    public class CompraForCreateDTO
+    {
+        // Constructor que inicializa la lista de elementos de compra (de los CompraItems que son individuales, y en cada posicion se alojará un objeto DTO CompraItemDTO)
+        public CompraForCreateDTO()
+        {
+            CompraItems = new List<CompraItemDTO>();
+        }
+
+        /*
+        El UsuarioUserName es necesario en el DTO para que la API pueda identificar en la base de datos 
+        al cliente que realiza la compra y asociarla correctamente a su cuenta
+        */
+        [EmailAddress(ErrorMessage = "El formato del usuario debe ser un correo electrónico válido")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Por favor, establece el usuario (email)")]
+        public string UsuarioUserName { get; set; } = "persona@uclm.es";
+
+        [Required(ErrorMessage = "El nombre es obligatorio")]
+        public string Nombre { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Los apellidos son obligatorios")]
+        public string Apellidos { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La dirección es obligatoria")]
+        
+        public string Direccion { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El teléfono es obligatorio")]
+        public string Telefono { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El método de pago es obligatorio")]
+        public int MetodoDePago { get; set; } //lo pongo int ya que son por numeros (1: GooglePay, 2: Paypal, 3: Visa)
+
+        [StringLength(10, MinimumLength = 5, ErrorMessage = "El código de descuento debe tener entre 5 y 10 caracteres")]
+        public string? CodigoDescuento { get; set; } //opcional segun el parrafo 5 del flujo básico
+
+        // Lista de libros o elementos que el usuario ha seleccionado para comprar
+        public IList<CompraItemDTO> CompraItems { get; set; }
+
+
+        // Propiedad calculada: Calcula de forma automática el precio total de la compra en tiempo real
+        
+        [JsonPropertyName("PrecioTotal")]//esta etiqueta fuerza a que la propiedad se llame exactamente "PrecioTotal" en el JSON resultante, evitando que cambie por reglas globales de mayúsculas y minúsculas
+        public double PrecioTotal
+        {
+            get
+            {
+                // LINQ .Sum(): Recorre cada ítem (ci), multiplica su precio por la cantidad y suma todos los subtotales
+                return CompraItems.Sum(ci => ci.PrecioCompra * ci.Cantidad); //ci==compra item
+            }
+        }
+    }
+}
+
+
+
+
+
+/*Explicacion
+
+[JsonPropertyName("PrecioTotal")]: Obliga a que en el código JSON que se envía y recibe la API, la clave se escriba exactamente así ("PrecioTotal").
+
+El cálculo automático (get con LINQ): Es como una calculadora interna. Cada vez que el sistema necesita saber el precio, coge la lista de libros, multiplica la cantidad de cada uno por su precio unitario, los suma todos de golpe y te devuelve el precio final al instante.
+*/
+
+/*
+Explicación mas detallada del:
+return CompraItems.Sum(ci => ci.PrecioCompra * ci.Cantidad);
+
+.Sum() es una función de LINQ en C# que recorre toda la lista de elementos (CompraItems), 
+ejecuta la operación matemática que le indiques dentro de los paréntesis para cada elemento, 
+y al final suma todos los resultados obtenidos
+
+1º: cada libro de la lista ci, multiplica su precio unitario(PrecioCompra) por las unidades 
+    que el usuario quiere comprar(Cantidad). Y esto da el subtotal de ese libro concreto
+
+2º: sumo todos los subtotales de todos los libros que están en la lista de la compra
+
+3º: devuelve el precio total de toda la compra
+
+
+
+*/

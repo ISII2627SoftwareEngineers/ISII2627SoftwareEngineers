@@ -4,6 +4,7 @@ namespace AppForSEII.API.DTOs.CompraDTOs
     public class CompraItemDTO
     {
         // Constructor que recibe los datos principales del libro comprado
+        //constructor para post
         public CompraItemDTO(int libroID, string titulo, string genero, string editorial, int cantidad, double precioCompra)
         {
             LibroID = libroID;     
@@ -13,6 +14,7 @@ namespace AppForSEII.API.DTOs.CompraDTOs
             Cantidad= cantidad;
             PrecioCompra= precioCompra;
         }
+        //constructor para detail
         public CompraItemDTO(int libroID, string titulo, string genero, string editorial)
         {
             LibroID = libroID;     

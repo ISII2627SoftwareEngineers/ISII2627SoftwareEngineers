@@ -20,6 +20,7 @@ namespace AppForSEII.API.Controllers
             _logger = logger;
         }
 
+        //----------------------------------------------------------METODO DETAIL-------------------------------------------------------------------
         [HttpGet]
         [Route("[action]")]
         [ProducesResponseType(typeof(CompraDetailDTO), (int)HttpStatusCode.OK)]
@@ -77,4 +78,9 @@ namespace AppForSEII.API.Controllers
             return Ok(compra);
         }
     }
+
+    //-----------------------------------------------------------------METODO POST-----------------------------------------------------------------------
+
+
+    
 }

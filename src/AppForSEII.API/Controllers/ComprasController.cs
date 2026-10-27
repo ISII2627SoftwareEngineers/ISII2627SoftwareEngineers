@@ -58,7 +58,7 @@ namespace AppForSEII.API.Controllers
                    c.Usuario != null ? c.Usuario.PhoneNumber ?? string.Empty : string.Empty,        
                    c.FechaCompra,
                    (decimal)c.PrecioTotal,
-                   c.MetodoPago != null ? c.MetodoPago.ToString() : string.Empty,
+                   c.MetodoPago != null ? c.MetodoPago.GetType().Name: string.Empty, //cambie el c.MetodoPago.ToString() por c.MetodoPago.GetType().Name porque de esta manera solo me pone el nombre del metodo de pago (Ej: "Visa") y no "AppForSEII.API.Models.Visa"
                    c.CodigoDescuento,
                    c.CompraItems
                        .Select(ci => new CompraItemDTO(

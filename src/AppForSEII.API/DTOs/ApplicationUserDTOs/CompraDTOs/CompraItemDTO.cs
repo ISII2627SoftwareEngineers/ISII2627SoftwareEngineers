@@ -13,6 +13,15 @@ namespace AppForSEII.API.DTOs.CompraDTOs
             Cantidad= cantidad;
             PrecioCompra= precioCompra;
         }
+        public CompraItemDTO(int libroID, string titulo, string genero, string editorial)
+        {
+            LibroID = libroID;     
+            Titulo = titulo;       
+            Genero = genero;       
+            Editorial = editorial; 
+            
+        }
+
 
         public int LibroID { get; set; } 
 

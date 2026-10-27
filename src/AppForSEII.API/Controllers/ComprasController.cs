@@ -90,7 +90,7 @@ namespace AppForSEII.API.Controllers
     [ProducesResponseType(typeof(CompraDetailDTO), (int)HttpStatusCode.Created)]
     [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
-    public async Task<ActionResult> GreteCompra(CompraForCreateDTO compraForCreate) 
+    public async Task<ActionResult> CreateCompra(CompraForCreateDTO compraForCreate) 
     {
         // -----------------BLOQUE 1. Validaciones previas de entrada--------------------
         if (compraForCreate.CompraItems == null || compraForCreate.CompraItems.Count == 0)

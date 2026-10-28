@@ -36,7 +36,7 @@ public class ReposicionesController : ControllerBase
 
         var reposicionDetails = await _context.Reposiciones
             .Include(r => r.Usuario)
-            .Include(r => r.MetodosPago)
+            .Include(r => r.MetodoPago)
             .Include(r => r.ReposicionItems)
                 .ThenInclude(ri => ri.Libro)
             .Where(r => r.Id == id)
@@ -51,7 +51,8 @@ public class ReposicionesController : ControllerBase
                 Apellidos = r.Usuario != null ? r.Usuario.Apellidos : string.Empty,
                 TelefonoUsuario = r.Usuario != null ? r.Usuario.PhoneNumber : string.Empty,
                 
-                MetodoPago = r.MetodosPago != null && r.MetodosPago.Any() ? r.MetodosPago.First().ToString() : string.Empty,
+                // Mapeo del método de pago único
+                MetodoPago = r.MetodoPago != null ? r.MetodoPago.GetType().Name : string.Empty,
                 
                 ReposicionItems = r.ReposicionItems.Select(ri => new ReposicionItemDTO(
                     ri.Libro != null ? ri.Libro.Titulo : string.Empty,

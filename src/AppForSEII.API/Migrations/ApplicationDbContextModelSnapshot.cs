@@ -249,12 +249,7 @@ namespace AppForSEII.API.Migrations
                         .HasMaxLength(13)
                         .HasColumnType("nvarchar(13)");
 
-                    b.Property<int>("ReposicionId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("ReposicionId");
 
                     b.ToTable("MetodosPago");
 
@@ -278,6 +273,9 @@ namespace AppForSEII.API.Migrations
                     b.Property<DateTime>("FechaReposicion")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("MetodoPagoId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("PrecioTotal")
                         .HasColumnType("decimal(18,2)");
 
@@ -286,6 +284,8 @@ namespace AppForSEII.API.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MetodoPagoId");
 
                     b.HasIndex("UsuarioId");
 
@@ -581,24 +581,19 @@ namespace AppForSEII.API.Migrations
                     b.Navigation("Genero");
                 });
 
-            modelBuilder.Entity("AppForSEII.API.Models.MetodoPago", b =>
-                {
-                    b.HasOne("AppForSEII.API.Models.Reposicion", "Reposicion")
-                        .WithMany("MetodosPago")
-                        .HasForeignKey("ReposicionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Reposicion");
-                });
-
             modelBuilder.Entity("AppForSEII.API.Models.Reposicion", b =>
                 {
+                    b.HasOne("AppForSEII.API.Models.MetodoPago", "MetodoPago")
+                        .WithMany("Reposiciones")
+                        .HasForeignKey("MetodoPagoId");
+
                     b.HasOne("AppForSEII.API.Models.ApplicationUser", "Usuario")
                         .WithMany("Reposiciones")
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("MetodoPago");
 
                     b.Navigation("Usuario");
                 });
@@ -739,12 +734,12 @@ namespace AppForSEII.API.Migrations
             modelBuilder.Entity("AppForSEII.API.Models.MetodoPago", b =>
                 {
                     b.Navigation("Compras");
+
+                    b.Navigation("Reposiciones");
                 });
 
             modelBuilder.Entity("AppForSEII.API.Models.Reposicion", b =>
                 {
-                    b.Navigation("MetodosPago");
-
                     b.Navigation("ReposicionItems");
                 });
 

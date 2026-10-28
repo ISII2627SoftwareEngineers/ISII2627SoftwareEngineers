@@ -187,7 +187,7 @@ if (dbContext.Libros.FirstOrDefault(l => l.Titulo == "El libro troll") == null) 
         FechaLanzamiento = new DateTime(1996, 8, 6).ToUniversalTime(),
         PrecioCompra = 18.0m,       
         PrecioReposicion = 12.0m,   
-        Stock = 25,                 
+        Stock = 0,                 
         Genero = generos[0],
         Editorial = editoriales[1]
     };
@@ -359,7 +359,7 @@ public static void SeedReposiciones(ApplicationDbContext dbContext, ApplicationU
                 FechaReposicion = new DateTime(2024, 3, 1).ToUniversalTime(),
                 PrecioTotal = 150.0m,
                 Usuario = user,
-                MetodosPago = new List<MetodoPago> { metodoPagoVisa },
+                MetodoPago = metodoPagoVisa,
                 ReposicionItems = new List<ReposicionItem>()
             };
 
@@ -387,7 +387,7 @@ public static void SeedReposiciones(ApplicationDbContext dbContext, ApplicationU
                 FechaReposicion = new DateTime(2024, 3, 15).ToUniversalTime(),
                 PrecioTotal = 80.0m,
                 Usuario = user,
-                MetodosPago = new List<MetodoPago> { metodoPagoPaypal },
+                MetodoPago = metodoPagoPaypal,
                 ReposicionItems = new List<ReposicionItem>()
             };
 
@@ -407,7 +407,7 @@ public static void SeedReposiciones(ApplicationDbContext dbContext, ApplicationU
                 FechaReposicion = new DateTime(2024, 4, 2).ToUniversalTime(),
                 PrecioTotal = 120.50m,
                 Usuario = user,
-                MetodosPago = new List<MetodoPago> { metodoPagoGooglePay },
+                MetodoPago = metodoPagoGooglePay,
                 ReposicionItems = new List<ReposicionItem>()
             };
 
@@ -427,7 +427,7 @@ public static void SeedReposiciones(ApplicationDbContext dbContext, ApplicationU
                 FechaReposicion = new DateTime(2024, 4, 18).ToUniversalTime(),
                 PrecioTotal = 210.0m,
                 Usuario = user,
-                MetodosPago = new List<MetodoPago> { metodoPagoVisa2 },
+                MetodoPago = metodoPagoVisa2,
                 ReposicionItems = new List<ReposicionItem>()
             };
 

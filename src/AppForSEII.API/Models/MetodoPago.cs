@@ -9,10 +9,10 @@ namespace AppForSEII.API.Models
             Compras = new List<Compra>();
         }
 
-        public MetodoPago(int id, Reposicion reposicion, IList<Compra> compras)
+        public MetodoPago(int id, IList<Reposicion> reposiciones, IList<Compra> compras)
         {
             Id = id;
-            Reposicion = reposicion;
+            Reposiciones = reposiciones ?? new List<Reposicion>();
             Compras = compras ?? new List<Compra>();
         }
 
@@ -20,7 +20,7 @@ namespace AppForSEII.API.Models
         public int Id { get; set; }
 
 
-        public Reposicion Reposicion {get; set;}
+        public IList<Reposicion> Reposiciones  {get; set;} // Relacion 1 a N hacia Reposicion
         public IList<Compra> Compras { get; set; } // Relacion 1 a N hacia Compra
     }
 }

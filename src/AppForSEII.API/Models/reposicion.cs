@@ -7,17 +7,16 @@ public class Reposicion
 public Reposicion()
     {
         ReposicionItems = new List<ReposicionItem>();
-        MetodosPago = new List<MetodoPago>();
     }
 
-    public Reposicion(int id, DateTime fechaReposicion, decimal precioTotal, string? comentario, IList<ReposicionItem> reposicionItems, IList<MetodoPago> metodosPago, ApplicationUser usuario)
+    public Reposicion(int id, DateTime fechaReposicion, decimal precioTotal, string? comentario, IList<ReposicionItem> reposicionItems, MetodoPago metodoPago, ApplicationUser usuario)
     {
         Id = id;
         FechaReposicion = fechaReposicion;
         PrecioTotal = precioTotal;
         Comentario = comentario;
         ReposicionItems = reposicionItems ?? new List<ReposicionItem>();
-        MetodosPago = metodosPago ?? new List<MetodoPago>();
+        MetodoPago = metodoPago;
         Usuario = usuario;
     }
 
@@ -35,8 +34,7 @@ public Reposicion()
 
     public IList<ReposicionItem>ReposicionItems {get; set;}
 
-
-    public IList<MetodoPago> MetodosPago {get; set;}
+    public MetodoPago? MetodoPago { get; set; }
 
     public ApplicationUser Usuario{ get; set;}
 

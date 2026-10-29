@@ -24,14 +24,13 @@ namespace AppForSEII.API.Controllers
  [HttpGet]
 [Route("[action]")]
 [ProducesResponseType(typeof(IList<LibroParaResenarDTO>), (int) HttpStatusCode.OK)]
-public async Task<ActionResult> GetLibrosParaResenar(string? titulo, string? tipoLibro, string? genero)
+public async Task<ActionResult> GetLibrosParaResenar(string? tipoLibro, string? genero)
 {
     var libros = await _context.Libros
         .Include(l => l.Genero)
         .Include(l => l.Editorial)
         // Usamos Contains() para búsquedas parciales
-        .Where(l => (string.IsNullOrEmpty(titulo) || l.Titulo.Contains(titulo))
-                 && (string.IsNullOrEmpty(tipoLibro) || l.TipoLibro.Contains(tipoLibro)) 
+        .Where(l => (string.IsNullOrEmpty(tipoLibro) || l.TipoLibro.Contains(tipoLibro)) 
                  && (string.IsNullOrEmpty(genero) || (l.Genero != null && l.Genero.Nombre.Contains(genero))))
         .Select(l => new LibroParaResenarDTO(
             l.Id,

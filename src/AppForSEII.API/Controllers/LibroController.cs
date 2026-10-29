@@ -77,29 +77,27 @@ public async Task<ActionResult> GetLibrosParaComprar(string? genero, decimal? pr
 [HttpGet]
 [Route("[action]")]
 [ProducesResponseType(typeof(IList<LibroParaReponerDTO>), (int)HttpStatusCode.OK)]
-public async Task<ActionResult> GetLibrosParaReponer(
-    string? titulo, 
-    string? genero, 
-    string? autor, 
-    DateTime? fechaLanzamiento, 
-    decimal? precioReposicion) // <-- Añadido como parámetro de búsqueda opcional
+[ProducesResponseType((int)HttpStatusCode.NotFound)]
+public async Task<ActionResult> GetLibrosParaReponer(string? genero, string? autor)
 {
+    // Validación crítica de seguridad
+    if (_context.Libros == null)
+    {
+        return NotFound("La tabla de libros no existe.");
+    }
+
     var libros = await _context.Libros
-        .Include(l => l.Genero)
-        .Include(l => l.Editorial)
-        .Where(l => l.Stock == 0 // Filtro de stock = 0 según el enunciado
-                 && (titulo == null || l.Titulo.Contains(titulo)) 
-                 && (genero == null || (l.Genero != null && l.Genero.Nombre.Equals(genero)))
-                 && (autor == null || l.Autor.Contains(autor))
-                 && (fechaLanzamiento == null || l.FechaLanzamiento.Date == fechaLanzamiento.Value.Date)
-                 && (precioReposicion == null || l.PrecioReposicion == precioReposicion)) // <-- Filtro de búsqueda por precio
+        .Include(l => l.Genero) 
+        .Where(l => l.Stock == 0 
+                 && (string.IsNullOrEmpty(genero) || (l.Genero != null && l.Genero.Nombre.Equals(genero)))
+                 && (string.IsNullOrEmpty(autor) || l.Autor.Contains(autor)))
         .Select(l => new LibroParaReponerDTO(
             l.Id,
             l.Titulo,
             l.Genero != null ? l.Genero.Nombre : string.Empty,
             l.Autor,
             l.FechaLanzamiento,
-            l.PrecioReposicion // <-- Propiedad mostrada en el DTO
+            l.PrecioReposicion 
         ))
         .ToListAsync();
 

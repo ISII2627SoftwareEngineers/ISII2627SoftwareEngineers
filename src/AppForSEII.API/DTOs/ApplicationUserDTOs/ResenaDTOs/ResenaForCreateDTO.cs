@@ -7,6 +7,17 @@ namespace AppForSEII.API.DTOs
 {
     public class ResenaForCreateDTO
     {
+        public ResenaForCreateDTO(string usuarioUserName, string nombre, string apellidos, string direccion, string telefono, string tituloResena, IList<ResenaItemDTO> resenaItems)
+        {
+            UsuarioUserName = usuarioUserName ?? throw new ArgumentNullException(nameof(usuarioUserName));
+            Nombre = nombre ?? throw new ArgumentNullException(nameof(nombre));
+            Apellidos = apellidos ?? throw new ArgumentNullException(nameof(apellidos));
+            Direccion = direccion ?? throw new ArgumentNullException(nameof(direccion));
+            Telefono = telefono ?? throw new ArgumentNullException(nameof(telefono));
+            TituloResena = tituloResena ?? throw new ArgumentNullException(nameof(tituloResena));
+            ResenaItems = resenaItems ?? throw new ArgumentNullException(nameof(resenaItems));
+        }
+        
         public ResenaForCreateDTO()
         {
             ResenaItems = new List<ResenaItemDTO>();

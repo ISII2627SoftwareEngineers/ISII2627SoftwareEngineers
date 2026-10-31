@@ -10,15 +10,20 @@ public class ReposicionItemDTO
 
     public string Autor { get; set; } = string.Empty;
 
-    [Range(1, int.MaxValue, ErrorMessage = "La cantidad debe ser al menos 1.")]
+    [Range(2, int.MaxValue, ErrorMessage = "La cantidad debe ser mayor a 1.")]
     public int Cantidad { get; set; }
+
+    public int LibroId{ get; set; }
+
+    public double PrecioReposicion { get; set; }
 
     // Constructor vacío para serialización JSON
     public ReposicionItemDTO() { }
 
     // Constructor para proyectar desde LINQ (.Select)
-    public ReposicionItemDTO(string tituloLibro, string autor, int cantidad)
+    public ReposicionItemDTO(int libroID, string tituloLibro, string autor, int cantidad)
     {
+        LibroId = libroID;
         TituloLibro = tituloLibro;
         Autor = autor;
         Cantidad = cantidad;
@@ -27,13 +32,14 @@ public class ReposicionItemDTO
     public override bool Equals(object? obj)
     {
         return obj is ReposicionItemDTO other &&
-               TituloLibro == other.TituloLibro &&
-               Autor == other.Autor &&
-               Cantidad == other.Cantidad;
+                LibroId == other.LibroId &&
+                TituloLibro == other.TituloLibro &&
+                Autor == other.Autor &&
+                Cantidad == other.Cantidad;
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(TituloLibro, Autor, Cantidad);
+        return HashCode.Combine(LibroId, TituloLibro, Autor, Cantidad);
     }
 }

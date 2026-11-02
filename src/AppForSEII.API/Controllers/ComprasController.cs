@@ -55,7 +55,7 @@ namespace AppForSEII.API.Controllers
                    c.Usuario != null ? c.Usuario.Nombre : string.Empty, //Si el usuario existe, coge su nombre; si no, lo dejo vacío (Condición ? Resultado si es Verdadero : Resultado si es Falso)
                    c.Usuario != null ? c.Usuario.Apellidos : string.Empty,
                    c.Usuario != null ? c.Usuario.Direccion : string.Empty,
-                   c.Usuario != null ? c.Usuario.PhoneNumber ?? string.Empty : string.Empty,        
+                   c.Usuario != null ? c.Usuario.PhoneNumber ?? string.Empty : string.Empty, //si el PhoneNumber es null, lo dejo vacío (?? string.Empty)
                    c.FechaCompra,
                    (decimal)c.PrecioTotal,
                    c.MetodoPago != null ? c.MetodoPago.GetType().Name: string.Empty, //cambie el c.MetodoPago.ToString() por c.MetodoPago.GetType().Name porque de esta manera solo me pone el nombre del metodo de pago (Ej: "Visa") y no "AppForSEII.API.Models.Visa"
@@ -102,9 +102,23 @@ namespace AppForSEII.API.Controllers
             // Validación de la cantidad de compra (según el flujo básico, mayor que 1)
             foreach (var item in compraForCreate.CompraItems)
             {
+                // Comprueba que la cantidad pedida sea mayor que 1 (según flujo básico)
                 if (item.Cantidad <= 1)
                 {
                     ModelState.AddModelError("CompraItems", $"¡Error! La cantidad para el libro '{item.Titulo}' debe ser mayor que 1");
+                }
+
+                // Buscar el libro en la base de datos por su título
+                var libro = _context.Libros.FirstOrDefault(l => l.Titulo == item.Titulo);
+                // Si el libro no se encuentra en la base de datos, añade un error
+                if (libro == null)
+                {
+                ModelState.AddModelError("CompraItems", $"¡Error! El libro '{item.Titulo}' no existe en el sistema.");
+                }
+                //Si el libro existe pero el stock disponible es menor que la cantidad que se quiere comprar, frena la compra
+                else if (libro.Stock < item.Cantidad)
+                {
+                ModelState.AddModelError("CompraItems", $"¡Error! No hay suficiente stock para el libro '{item.Titulo}'. Stock disponible: {libro.Stock}");
                 }
             }
         }
@@ -189,6 +203,8 @@ namespace AppForSEII.API.Controllers
                 };
 
                     compra.CompraItems.Add(compraItem);
+
+                    libro.Stock= libro.Stock-item.Cantidad;
             }
         }
 
@@ -207,7 +223,7 @@ namespace AppForSEII.API.Controllers
         compra.PrecioTotal = compraForCreate.PrecioTotal; 
 
         //-----------------------BLOQUE 4: Inserción en la Base de Datos-----------------------------------
-        _context.Add(compra);
+        _context.Add(compra); //no añade a la base de dstos, se asigna la compra a la variable que se conecta a la base de datos para despues guardarla
 
         try 
         {
@@ -221,7 +237,7 @@ namespace AppForSEII.API.Controllers
         }
 
         //-----------BLOQUE 5: devolver 201 + details (paso 7)--------------------
-        // Construyo el DTO de respuesta para el Details usando los datos actualizados del usuario
+        // Construyo el DTO de respuesta para el Details usando los datos actualizados del usuario PARA ENSEÑARSELO AL USUARIO QUE LO ACABA DE HACER
         var compraDetail = new CompraDetailDTO(
             compra.Id,
             user.Nombre ?? string.Empty,

@@ -6,12 +6,12 @@ using System.Net;
 
 namespace AppForSEII.API.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
+    [Route("api/[controller]")] // Define la ruta base del controlador, que será "api/Resenas"
+    [ApiController] // Indica que este controlador es un controlador de API, lo que habilita ciertas características 
     public class ResenasController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-        private readonly ILogger<ResenasController> _logger;
+        private readonly ApplicationDbContext _context; // Referencia al contexto de la base de datos para acceder a las entidades
+        private readonly ILogger<ResenasController> _logger; // Referencia al logger para registrar información y errores durante la ejecución del controlador
 
         public ResenasController(ApplicationDbContext context, ILogger<ResenasController> logger)
         {
@@ -19,42 +19,42 @@ namespace AppForSEII.API.Controllers
             _logger = logger;
         }
 
-        [HttpGet]
-        [Route("[action]")]
-        [ProducesResponseType(typeof(ResenaDetailDTO), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [HttpGet] // Define que este método responde a solicitudes HTTP GET
+        [Route("[action]")] // Define la ruta específica para este método, que será "api/Resenas/GetDetailsForResenas"
+        [ProducesResponseType(typeof(ResenaDetailDTO), (int)HttpStatusCode.OK)] // Indica que este método puede devolver un estado HTTP 200 OK con un objeto de tipo ResenaDetailDTO
+        [ProducesResponseType((int)HttpStatusCode.NotFound)] // Indica que este método puede devolver un estado HTTP 404 Not Found si no se encuentra la reseña
         public async Task<ActionResult> GetDetailsForResenas(int id)
         {
-            var resena = await _context.Resenas
-                .Where(r => r.Id == id)
+            var resena = await _context.Resenas // Accede a la tabla de reseñas en la base de datos
+                .Where(r => r.Id == id) // Filtra la reseña por el ID proporcionado
                 .Include(r => r.Usuario) // Join a la tabla de ApplicationUser para nombre, apellidos y teléfono
                 .Include(r => r.ResenaItems) // Join a la tabla intermedia
                     .ThenInclude(ri => ri.Libro) // Join a la tabla Libro para el título y tipo
                         .ThenInclude(l => l.Editorial) // Join a la tabla Editorial para el nombre de la editorial
-                .Select(r => new ResenaDetailDTO(
+                .Select(r => new ResenaDetailDTO( // Proyección a un DTO para devolver solo la información necesaria
                     r.Id,
-                    r.Usuario != null ? (r.Usuario.Nombre ?? string.Empty) : string.Empty,
+                    r.Usuario != null ? (r.Usuario.Nombre ?? string.Empty) : string.Empty, // ? es como un if, si Usuario es null, devuelve string.Empty, si no, devuelve el nombre del usuario o string.Empty si es null
                     r.Usuario != null ? (r.Usuario.Apellidos ?? string.Empty) : string.Empty,
                     r.Usuario != null ? (r.Usuario.PhoneNumber ?? string.Empty) : string.Empty,
                     r.FechaResena,
-                    r.ResenaItems.Select(ri => new ResenaItemDTO(
+                    r.ResenaItems.Select(ri => new ResenaItemDTO( // Proyección de los items de la reseña a un DTO
                      ri.LibroId,
-                     ri.Libro != null ? ri.Libro.Titulo : string.Empty,
-                     ri.Libro != null && ri.Libro.Editorial != null ? ri.Libro.Editorial.Nombre : string.Empty,
+                     ri.Libro != null ? ri.Libro.Titulo : string.Empty, // ? es como un if, si Libro es null, devuelve string.Empty, si no, devuelve el título del libro
+                     ri.Libro != null && ri.Libro.Editorial != null ? ri.Libro.Editorial.Nombre : string.Empty, // Si Libro o Editorial es null, devuelve string.Empty, si no, devuelve el nombre de la editorial
                      ri.Libro != null ? ri.Libro.TipoLibro : string.Empty,
                      ri.Calificacion,
                      ri.Descripcion ?? string.Empty
-                )).ToList()
+                )).ToList() // Convierte la colección de ResenaItemDTO a una lista
                 ))
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(); // Devuelve el primer elemento de la colección o null si no hay elementos
 
-            if (resena == null)
+            if (resena == null) // Si no se encuentra la reseña con el ID proporcionado, devuelve un estado HTTP 404 Not Found
             {
-                _logger.LogError($"Error: La reseña con id {id} no existe");
-                return NotFound();
+                _logger.LogError($"Error: La reseña con id {id} no existe"); // Registra un error en el logger indicando que la reseña no existe
+                return NotFound(); // Devuelve un estado HTTP 404 Not Found
             }
 
-            return Ok(resena);
+            return Ok(resena); // Devuelve un estado HTTP 200 OK con el objeto ResenaDetailDTO
         }
 
         [HttpPost]

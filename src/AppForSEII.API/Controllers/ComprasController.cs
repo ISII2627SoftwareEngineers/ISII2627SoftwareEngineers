@@ -189,6 +189,8 @@ namespace AppForSEII.API.Controllers
                 };
 
                     compra.CompraItems.Add(compraItem);
+
+                    libro.Stock= libro.Stock-item.Cantidad;
             }
         }
 
@@ -207,7 +209,7 @@ namespace AppForSEII.API.Controllers
         compra.PrecioTotal = compraForCreate.PrecioTotal; 
 
         //-----------------------BLOQUE 4: Inserción en la Base de Datos-----------------------------------
-        _context.Add(compra);
+        _context.Add(compra); //no añade a la base de dstos, se asigna la compra a la variable que se conecta a la base de datos para despues guardarla
 
         try 
         {
@@ -221,7 +223,7 @@ namespace AppForSEII.API.Controllers
         }
 
         //-----------BLOQUE 5: devolver 201 + details (paso 7)--------------------
-        // Construyo el DTO de respuesta para el Details usando los datos actualizados del usuario
+        // Construyo el DTO de respuesta para el Details usando los datos actualizados del usuario PARA ENSEÑARSELO AL USUARIO QUE LO ACABA DE HACER
         var compraDetail = new CompraDetailDTO(
             compra.Id,
             user.Nombre ?? string.Empty,

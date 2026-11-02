@@ -57,34 +57,34 @@ namespace AppForSEII.API.Controllers
             return Ok(resena); // Devuelve un estado HTTP 200 OK con el objeto ResenaDetailDTO
         }
 
-        [HttpPost]
-[Route("[action]")]
-[ProducesResponseType(typeof(ResenaDetailDTO), (int)HttpStatusCode.Created)]
-[ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
-[ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
+        [HttpPost] // Define que este método responde a solicitudes HTTP POST
+[Route("[action]")] // Define la ruta específica para este método, que será "api/Resenas/CreateResena"
+[ProducesResponseType(typeof(ResenaDetailDTO), (int)HttpStatusCode.Created)] // Indica que este método puede devolver un estado HTTP 201 Created con un objeto de tipo ResenaDetailDTO
+[ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)] // Indica que este método puede devolver un estado HTTP 400 Bad Request con un objeto de tipo ValidationProblemDetails si hay errores de validación
+[ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)] // Indica que este método puede devolver un estado HTTP 409 Conflict con un mensaje de error si hay un conflicto al guardar la reseña
 public async Task<ActionResult> CreateResena(ResenaForCreateDTO resenaForCreate) 
 {
     // 1. Validaciones previas
-    if (resenaForCreate.ResenaItems == null || resenaForCreate.ResenaItems.Count == 0)
-        ModelState.AddModelError("ResenaItems", "¡Error! Debes incluir al menos un libro para reseñar");
+    if (resenaForCreate.ResenaItems == null || resenaForCreate.ResenaItems.Count == 0) // Validar que se incluyan al menos un libro para reseñar
+        ModelState.AddModelError("ResenaItems", "¡Error! Debes incluir al menos un libro para reseñar"); // Agrega un error al ModelState si no se incluyen libros
 
     // Buscar el usuario en la base de datos
-    var user = _context.ApplicationUsers.FirstOrDefault(au => au.UserName == resenaForCreate.UsuarioUserName);
-    if (user == null)
-        ModelState.AddModelError("Usuario", "¡Error! El UserName no está registrado");
+    var user = _context.ApplicationUsers.FirstOrDefault(au => au.UserName == resenaForCreate.UsuarioUserName); // Busca el usuario en la base de datos por su UserName
+    if (user == null) // Si no se encuentra el usuario, agrega un error al ModelState
+        ModelState.AddModelError("Usuario", "¡Error! El UserName no está registrado"); // Agrega un error al ModelState si el usuario no está registrado
 
-    if (ModelState.ErrorCount > 0)
-        return BadRequest(new ValidationProblemDetails(ModelState));
+    if (ModelState.ErrorCount > 0) // Si hay errores en el ModelState, devuelve un estado HTTP 400 Bad Request
+        return BadRequest(new ValidationProblemDetails(ModelState)); // Devuelve un estado HTTP 400 Bad Request con los detalles de validación
 
     // 2. Extraer los títulos de los libros del DTO para buscarlos en la BD
-    var titulosLibros = resenaForCreate.ResenaItems.Select(ri => ri.Titulo).ToList();
+    var titulosLibros = resenaForCreate.ResenaItems.Select(ri => ri.Titulo).ToList(); // Extrae los títulos de los libros del DTO para buscarlos en la base de datos
 
-    var libros = _context.Libros
-        .Where(l => titulosLibros.Contains(l.Titulo))
-        .ToList();
+    var libros = _context.Libros // Accede a la tabla de libros en la base de datos
+        .Where(l => titulosLibros.Contains(l.Titulo)) // Filtra los libros que coinciden con los títulos proporcionados en el DTO
+        .ToList(); // Convierte la colección de libros a una lista
 
     // 3. Crear la entidad principal Resena
-    Resena resena = new Resena 
+    Resena resena = new Resena
     {
         Usuario = user,
         FechaResena = DateTime.Now,
@@ -93,15 +93,15 @@ public async Task<ActionResult> CreateResena(ResenaForCreateDTO resenaForCreate)
     };
 
     // 4. Validar disponibilidad de los libros y crear los items usando el constructor
-    foreach (var item in resenaForCreate.ResenaItems) 
+    foreach (var item in resenaForCreate.ResenaItems)  // Itera sobre cada item de reseña proporcionado en el DTO
     {
-        var libro = libros.FirstOrDefault(l => l.Titulo == item.Titulo);
+        var libro = libros.FirstOrDefault(l => l.Titulo == item.Titulo); // Busca el libro correspondiente en la lista de libros obtenida de la base de datos
         
-        if (libro == null) 
+        if (libro == null) // Si no se encuentra el libro, agrega un error al ModelState indicando que el libro no existe
         {
-            ModelState.AddModelError("ResenaItems", $"¡Error! El libro titulado '{item.Titulo}' no existe en la base de datos");
+            ModelState.AddModelError("ResenaItems", $"¡Error! El libro titulado '{item.Titulo}' no existe en la base de datos"); // Agrega un error al ModelState si el libro no existe
         }
-        else 
+        else // Si el libro existe, crea un nuevo ResenaItem y lo agrega a la lista de items de la reseña
         {
             resena.ResenaItems.Add(new ResenaItem(
                 item.Calificacion, 
@@ -116,23 +116,23 @@ public async Task<ActionResult> CreateResena(ResenaForCreateDTO resenaForCreate)
         }
     }
 
-    if (ModelState.ErrorCount > 0) 
+    if (ModelState.ErrorCount > 0) // Si hay errores en el ModelState, devuelve un estado HTTP 400 Bad Request
     {
-        return BadRequest(new ValidationProblemDetails(ModelState));
+        return BadRequest(new ValidationProblemDetails(ModelState)); // Devuelve un estado HTTP 400 Bad Request con los detalles de validación
     }
 
     // 5. Guardado en Base de Datos
-    _context.Add(resena);
+    _context.Add(resena); // Agrega la entidad Resena al contexto de la base de datos para que sea guardada
 
     try 
     {
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(); // Intenta guardar los cambios en la base de datos de manera asíncrona
     }
     catch (Exception ex) 
     {
-        _logger.LogError(ex.Message);
-        ModelState.AddModelError("Resena", $"¡Error! Hubo un problema al guardar tu reseña, por favor inténtalo de nuevo más tarde");
-        return Conflict("Error: " + ex.Message);
+        _logger.LogError(ex.Message); // Registra el mensaje de error en el logger
+        ModelState.AddModelError("Resena", $"¡Error! Hubo un problema al guardar tu reseña, por favor inténtalo de nuevo más tarde"); // Agrega un error al ModelState indicando que hubo un problema al guardar la reseña
+        return Conflict("Error: " + ex.Message); // Devuelve un estado HTTP 409 Conflict con el mensaje de error
     }
 
     // 6. Construir el DTO de respuesta (Details)
@@ -145,7 +145,7 @@ public async Task<ActionResult> CreateResena(ResenaForCreateDTO resenaForCreate)
         resenaForCreate.ResenaItems
     );
 
-    return CreatedAtAction("GetDetailsForResenas", new { id = resena.Id }, resenaDetail);
+    return CreatedAtAction("GetDetailsForResenas", new { id = resena.Id }, resenaDetail); // Devuelve un estado HTTP 201 Created con la ruta para obtener los detalles de la reseña recién creada y el objeto ResenaDetailDTO
 }
     }
 }

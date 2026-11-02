@@ -9,7 +9,7 @@ namespace AppForSEII.API.DTOs
     {
         public ResenaForCreateDTO(string usuarioUserName, string nombre, string apellidos, string direccion, string telefono, string tituloResena, IList<ResenaItemDTO> resenaItems)
         {
-            UsuarioUserName = usuarioUserName ?? throw new ArgumentNullException(nameof(usuarioUserName));
+            UsuarioUserName = usuarioUserName ?? throw new ArgumentNullException(nameof(usuarioUserName)); // Lanza una excepción si es null
             Nombre = nombre ?? throw new ArgumentNullException(nameof(nombre));
             Apellidos = apellidos ?? throw new ArgumentNullException(nameof(apellidos));
             Direccion = direccion ?? throw new ArgumentNullException(nameof(direccion));
@@ -24,7 +24,7 @@ namespace AppForSEII.API.DTOs
         }
 
         [EmailAddress(ErrorMessage = "El formato del usuario debe ser un correo electrónico válido")]
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Por favor, establece el usuario (email)")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Por favor, establece el usuario (email)")] // AllowEmptyStrings = false indica que no se permiten cadenas vacías
         public string UsuarioUserName { get; set; } = "estudiante@uclm.es";
 
         [Required(ErrorMessage = "El nombre es obligatorio")]

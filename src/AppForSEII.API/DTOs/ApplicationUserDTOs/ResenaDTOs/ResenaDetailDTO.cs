@@ -25,7 +25,7 @@ namespace AppForSEII.API.DTOs
         public string Telefono { get; set; } = string.Empty;
         public DateTime FechaResena { get; set; }
         
-        public IList<ResenaItemDTO> ResenaItems { get; set; } = new List<ResenaItemDTO>();
+        public IList<ResenaItemDTO> ResenaItems { get; set; } = new List<ResenaItemDTO>(); // Inicializa la lista de ResenaItemDTO para evitar valores nulos
 
         public override bool Equals(object? obj)
         {

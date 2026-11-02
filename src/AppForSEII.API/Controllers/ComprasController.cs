@@ -102,9 +102,23 @@ namespace AppForSEII.API.Controllers
             // Validación de la cantidad de compra (según el flujo básico, mayor que 1)
             foreach (var item in compraForCreate.CompraItems)
             {
+                // Comprueba que la cantidad pedida sea mayor que 1 (según flujo básico)
                 if (item.Cantidad <= 1)
                 {
                     ModelState.AddModelError("CompraItems", $"¡Error! La cantidad para el libro '{item.Titulo}' debe ser mayor que 1");
+                }
+
+                // Buscar el libro en la base de datos por su título
+                var libro = _context.Libros.FirstOrDefault(l => l.Titulo == item.Titulo);
+                // Si el libro no se encuentra en la base de datos, añade un error
+                if (libro == null)
+                {
+                ModelState.AddModelError("CompraItems", $"¡Error! El libro '{item.Titulo}' no existe en el sistema.");
+                }
+                //Si el libro existe pero el stock disponible es menor que la cantidad que se quiere comprar, frena la compra
+                else if (libro.Stock < item.Cantidad)
+                {
+                ModelState.AddModelError("CompraItems", $"¡Error! No hay suficiente stock para el libro '{item.Titulo}'. Stock disponible: {libro.Stock}");
                 }
             }
         }

@@ -55,7 +55,7 @@ namespace AppForSEII.API.Controllers
                    c.Usuario != null ? c.Usuario.Nombre : string.Empty, //Si el usuario existe, coge su nombre; si no, lo dejo vacío (Condición ? Resultado si es Verdadero : Resultado si es Falso)
                    c.Usuario != null ? c.Usuario.Apellidos : string.Empty,
                    c.Usuario != null ? c.Usuario.Direccion : string.Empty,
-                   c.Usuario != null ? c.Usuario.PhoneNumber ?? string.Empty : string.Empty,        
+                   c.Usuario != null ? c.Usuario.PhoneNumber ?? string.Empty : string.Empty, //si el PhoneNumber es null, lo dejo vacío (?? string.Empty)
                    c.FechaCompra,
                    (decimal)c.PrecioTotal,
                    c.MetodoPago != null ? c.MetodoPago.GetType().Name: string.Empty, //cambie el c.MetodoPago.ToString() por c.MetodoPago.GetType().Name porque de esta manera solo me pone el nombre del metodo de pago (Ej: "Visa") y no "AppForSEII.API.Models.Visa"

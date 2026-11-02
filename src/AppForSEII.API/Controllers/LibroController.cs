@@ -21,18 +21,18 @@ namespace AppForSEII.API.Controllers
         }
         
         //Controlador para obtener los libros disponibles para reseñar, devolviendo un DTO con los atributos relevantes para la reseña.
- [HttpGet]
-[Route("[action]")]
-[ProducesResponseType(typeof(IList<LibroParaResenarDTO>), (int) HttpStatusCode.OK)]
-public async Task<ActionResult> GetLibrosParaResenar(string? tipoLibro, string? genero)
+ [HttpGet]  // Indica que el método responderá a peticiones HTTP GET
+[Route("[action]")] // Define la ruta de la acción, que será "api/Libro/GetLibrosParaResenar"
+[ProducesResponseType(typeof(IList<LibroParaResenarDTO>), (int) HttpStatusCode.OK)] // Indica que la respuesta será de tipo IList<LibroParaResenarDTO> con un código de estado HTTP 200 OK
+public async Task<ActionResult> GetLibrosParaResenar(string? tipoLibro, string? genero) // Los parámetros tipoLibro y genero son opcionales y se usan para filtrar los resultados
 {
-    var libros = await _context.Libros
-        .Include(l => l.Genero)
-        .Include(l => l.Editorial)
+    var libros = await _context.Libros // Accedemos a la tabla de libros en la base de datos
+        .Include(l => l.Genero) // Incluimos la relación con la tabla de géneros para poder acceder a los nombres de los géneros
+        .Include(l => l.Editorial) // Incluimos la relación con la tabla de editoriales para poder acceder a los nombres de las editoriales
         // Usamos Contains() para búsquedas parciales
-        .Where(l => (string.IsNullOrEmpty(tipoLibro) || l.TipoLibro.Contains(tipoLibro)) 
-                 && (string.IsNullOrEmpty(genero) || (l.Genero != null && l.Genero.Nombre.Contains(genero))))
-        .Select(l => new LibroParaResenarDTO(
+        .Where(l => (string.IsNullOrEmpty(tipoLibro) || l.TipoLibro.Contains(tipoLibro)) // Filtramos por tipo de libro si se proporciona
+                 && (string.IsNullOrEmpty(genero) || (l.Genero != null && l.Genero.Nombre.Contains(genero)))) // Filtramos por género si se proporciona, asegurándonos de que el género no sea nulo antes de acceder a su nombre
+        .Select(l => new LibroParaResenarDTO( // Creamos un nuevo DTO para cada libro que cumpla con los filtros
             l.Id,
             l.Titulo,
             l.TipoLibro,
@@ -42,9 +42,9 @@ public async Task<ActionResult> GetLibrosParaResenar(string? tipoLibro, string? 
             l.CalificacionMedia,
             l.FechaLanzamiento
         ))
-        .ToListAsync();
+        .ToListAsync(); // Ejecutamos la consulta de manera asíncrona y obtenemos la lista de libros que cumplen con los criterios de filtrado
 
-    return Ok(libros);
+    return Ok(libros); // Devolvemos la lista de libros en la respuesta HTTP con un código de estado 200 OK
 }
 
         //Controlador para obtener los libros disponibles para comprar (stock > 0), devolviendo un DTO con los atributos relevantes para la compra.

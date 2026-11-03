@@ -46,7 +46,8 @@ namespace AppForSEII.API.DTOs.CompraDTOs
                    PrecioTotal == dTO.PrecioTotal &&
                    MetodoPago == dTO.MetodoPago &&
                    CodigoDescuento == dTO.CodigoDescuento &&
-                   EqualityComparer<IList<CompraItemDTO>>.Default.Equals(CompraItems, dTO.CompraItems);
+                  CompraItems.SequenceEqual(dTO.CompraItems); // Compara el contenido de las listas elemento a elemento (con el Equals de CompraItemDTO).
+                 // Con EqualityComparer se compararían solo las referencias y devolvería false aunque el contenido fuera igual.
         }
         // Genera un código hash único para el objeto CompraDetailDTO(lo pone asi y no en una linea porque no acepta mas de 9 argumentos)
         public override int GetHashCode()

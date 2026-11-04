@@ -8,7 +8,18 @@ namespace AppForSEII.API.DTOs.CompraDTOs
         {
             CompraItems = new List<CompraItemDTO>();
         }
-
+        
+        public CompraForCreateDTO(string usuarioUserName, string nombre, string apellidos, string direccion, string telefono, int metodoDePago, string? codigoDescuento, IList<CompraItemDTO> compraItems)
+        {
+            UsuarioUserName = usuarioUserName ?? throw new ArgumentNullException(nameof(usuarioUserName)); // Lanza una excepción si es null
+            Nombre = nombre ?? throw new ArgumentNullException(nameof(nombre));
+            Apellidos = apellidos ?? throw new ArgumentNullException(nameof(apellidos));
+            Direccion = direccion ?? throw new ArgumentNullException(nameof(direccion));
+            Telefono = telefono ?? throw new ArgumentNullException(nameof(telefono));
+            MetodoDePago = metodoDePago;
+            CodigoDescuento = codigoDescuento; // Puede ser null, no lanzamos excepción
+            CompraItems = compraItems ?? throw new ArgumentNullException(nameof(compraItems));
+        }
         /*
         El UsuarioUserName es necesario en el DTO para que la API pueda identificar en la base de datos 
         al cliente que realiza la compra y asociarla correctamente a su cuenta

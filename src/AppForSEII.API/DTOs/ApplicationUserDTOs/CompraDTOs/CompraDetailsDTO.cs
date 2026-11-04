@@ -42,7 +42,7 @@ namespace AppForSEII.API.DTOs.CompraDTOs
                    Apellidos == dTO.Apellidos &&
                    Direccion == dTO.Direccion &&
                    Telefono == dTO.Telefono &&
-                   Fecha == dTO.Fecha &&
+                   Fecha.Date == dTO.Fecha.Date && // Compara solo el día: en el post la fecha es DateTime.Now y nunca coincidiría al milisegundo, por eso se compara solo con el día (sin horas, minutos ni segundos)
                    PrecioTotal == dTO.PrecioTotal &&
                    MetodoPago == dTO.MetodoPago &&
                    CodigoDescuento == dTO.CodigoDescuento &&
@@ -58,7 +58,7 @@ namespace AppForSEII.API.DTOs.CompraDTOs
             hash.Add(Apellidos);
             hash.Add(Direccion);
             hash.Add(Telefono);
-            hash.Add(Fecha);
+            hash.Add(Fecha.Date);
             hash.Add(PrecioTotal);
             hash.Add(MetodoPago);
             hash.Add(CodigoDescuento);

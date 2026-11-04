@@ -84,13 +84,13 @@ public async Task<ActionResult> CreateResena(ResenaForCreateDTO resenaForCreate)
         .ToList(); // Convierte la colección de libros a una lista
 
     // 3. Crear la entidad principal Resena
-    Resena resena = new Resena
-    {
-        Usuario = user,
-        FechaResena = DateTime.Now,
-        Titulo = resenaForCreate.TituloResena,
-        ResenaItems = new List<ResenaItem>()
-    };
+    Resena resena = new Resena(
+        0, 
+        resenaForCreate.TituloResena, 
+        DateTime.Now, 
+        user, 
+        new List<ResenaItem>()
+    );
 
     // 4. Validar disponibilidad de los libros y crear los items usando el constructor
     foreach (var item in resenaForCreate.ResenaItems)  // Itera sobre cada item de reseña proporcionado en el DTO

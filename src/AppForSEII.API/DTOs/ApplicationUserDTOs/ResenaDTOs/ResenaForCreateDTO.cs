@@ -44,5 +44,22 @@ namespace AppForSEII.API.DTOs
         public string TituloResena { get; set; } = string.Empty;
 
         public IList<ResenaItemDTO> ResenaItems { get; set; } = new List<ResenaItemDTO>();
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ResenaForCreateDTO dTO &&
+                   UsuarioUserName == dTO.UsuarioUserName &&
+                   Nombre == dTO.Nombre &&
+                   Apellidos == dTO.Apellidos &&
+                   Direccion == dTO.Direccion &&
+                   Telefono == dTO.Telefono &&
+                   TituloResena == dTO.TituloResena &&
+                   ResenaItems.SequenceEqual(dTO.ResenaItems);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(UsuarioUserName, Nombre, Apellidos, Direccion, Telefono, TituloResena);
+        }
     }
 }

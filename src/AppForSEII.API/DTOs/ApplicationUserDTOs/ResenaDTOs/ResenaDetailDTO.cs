@@ -34,7 +34,8 @@ namespace AppForSEII.API.DTOs
                    Nombre == dTO.Nombre &&
                    Apellidos == dTO.Apellidos &&
                    Telefono == dTO.Telefono &&
-                   FechaResena == dTO.FechaResena;
+                   FechaResena == dTO.FechaResena &&
+                   ResenaItems.SequenceEqual(dTO.ResenaItems);
         }
 
         public override int GetHashCode()

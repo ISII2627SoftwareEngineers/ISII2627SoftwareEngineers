@@ -28,11 +28,7 @@ namespace AppForSEII.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<ActionResult> GetDetailsForCompras(int id)
         {
-            if (_context.Compras == null) //esto salta si en la base de datos no existe la tabla Compras, lo cual no debería pasar nunca, pero por si acaso
-            {
-                _logger.LogError("Error: Compras table does not exist");
-                return NotFound();
-            }
+
 
             var compra = await _context.Compras //creo un objeto compra que contiene todos los datos de la compra con el id especificado, incluyendo los datos del usuario y los libros comprados
                .Where(c => c.Id == id) //filtro con where para que solo devuelva la compra con el id especificado

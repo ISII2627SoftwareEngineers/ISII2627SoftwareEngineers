@@ -78,177 +78,158 @@ namespace AppForSEII.API.Controllers
 
     
 
-    //-----------------------------------------------------------------METODO POST PARA COMPRAS-----------------------------------------------------------------------
+        //-----------------------------------------------------------------METODO POST PARA COMPRAS-----------------------------------------------------------------------
 
-    
-    [HttpPost]
-    [Route("[action]")]
-    [ProducesResponseType(typeof(CompraDetailDTO), (int)HttpStatusCode.Created)]
-    [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
-    [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
-    public async Task<ActionResult> CreateCompra(CompraForCreateDTO compraForCreate) 
-    {
-        // -----------------BLOQUE 1. Validaciones previas de entrada--------------------
-        if (compraForCreate.CompraItems == null || compraForCreate.CompraItems.Count == 0)
+        
+
+        [HttpPost]
+        [Route("[action]")]
+        [ProducesResponseType(typeof(CompraDetailDTO), (int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)]
+        public async Task<ActionResult> CreateCompra(CompraForCreateDTO compraForCreate)
         {
-            ModelState.AddModelError("CompraItems", "¡Error! Debes incluir al menos un libro para realizar la compra");
-        }
-        else
-        {
-            // Validación de la cantidad de compra (según el flujo básico, mayor que 1)
+            // -----------------BLOQUE 1. Validaciones previas de entrada (lista de libros, usuario y método de pago)--------------------
+            if (compraForCreate.CompraItems == null || compraForCreate.CompraItems.Count == 0)
+            {
+                ModelState.AddModelError("CompraItems", "¡Error! Debes incluir al menos un libro para realizar la compra");
+            }
+
+            // Buscar el usuario en la base de datos por su email (UsuarioUserName)
+            var user = _context.ApplicationUsers.FirstOrDefault(au => au.UserName == compraForCreate.UsuarioUserName);
+            if (user == null)
+            {
+                ModelState.AddModelError("UsuarioUserName", "¡Error! El UserName no está registrado");
+            }
+
+            // Busco el método de pago en la base de datos usando el ID que viene del DTO (Ej: "Busca en la tabla MetodosPago el registro con ID 3")
+            var metodoPagoBd = _context.MetodosPago.Find(compraForCreate.MetodoDePago);
+            if (metodoPagoBd == null)
+            {
+                ModelState.AddModelError("MetodoDePago", "¡Error! El método de pago seleccionado no es válido");
+            }
+
+            // Si algo de lo anterior falla, no seguimos (así user y metodoPagoBd no son null a partir de aquí)
+            if (ModelState.ErrorCount > 0)
+            {
+                return BadRequest(new ValidationProblemDetails(ModelState));
+            }
+
+            //---------------BLOQUE 2: (Comprobaciones) Consulta de libros, actualización del usuario y creación de la compra ----------------------------------
+            // Extraer los títulos de los libros del DTO para buscarlos de una sola vez en la base de datos
+            var titulosLibros = compraForCreate.CompraItems.Select(ci => ci.Titulo).ToList();
+
+            var libros = _context.Libros
+                .Include(l => l.Genero) // hago estos dos include para que no salga vacío género y editorial cuando el usuario lo vea
+                .Include(l => l.Editorial)
+            .Where(l => titulosLibros.Contains(l.Titulo)).ToList();
+
+            // Actualizamos los datos del perfil del usuario con los introducidos en el formulario de compra
+            // para que luego el GetDetailsForCompras los pueda mostrar correctamente desde c.Usuario
+            user.Nombre = compraForCreate.Nombre;
+            user.Apellidos = compraForCreate.Apellidos;
+            user.Direccion = compraForCreate.Direccion;
+            user.PhoneNumber = compraForCreate.Telefono;
+
+            // Constructor de Compra: id (0, lo genera la BD), fecha, precio total (0 de momento, se calcula tras recorrer los items),
+            // código de descuento, método de pago obtenido de la BD a través del ID, lista de items vacía y usuario
+            Compra compra = new Compra(
+                0,
+                DateTime.Now, 
+                0, 
+                compraForCreate.CodigoDescuento, 
+                metodoPagoBd!,
+                new List<CompraItem>(), 
+                user!
+            );
+
+            //--------------BLOQUE 3. Validar cada libro, rellenar el DTO, crear los CompraItems y restar stock------------------------
             foreach (var item in compraForCreate.CompraItems)
             {
+                var libro = libros.FirstOrDefault(l => l.Titulo == item.Titulo);
+
                 // Comprueba que la cantidad pedida sea mayor que 1 (según flujo básico)
                 if (item.Cantidad <= 1)
                 {
                     ModelState.AddModelError("CompraItems", $"¡Error! La cantidad para el libro '{item.Titulo}' debe ser mayor que 1");
                 }
-
-                // Buscar el libro en la base de datos por su título
-                var libro = _context.Libros.FirstOrDefault(l => l.Titulo == item.Titulo);
                 // Si el libro no se encuentra en la base de datos, añade un error
-                if (libro == null)
+                else if (libro == null)
                 {
-                ModelState.AddModelError("CompraItems", $"¡Error! El libro '{item.Titulo}' no existe en el sistema.");
+                    ModelState.AddModelError("CompraItems", $"¡Error! El libro '{item.Titulo}' no existe en el sistema.");
                 }
-                //Si el libro existe pero el stock disponible es menor que la cantidad que se quiere comprar, frena la compra
+                // Si el libro existe pero el stock disponible es menor que la cantidad que se quiere comprar, añade un error
                 else if (libro.Stock < item.Cantidad)
                 {
-                ModelState.AddModelError("CompraItems", $"¡Error! No hay suficiente stock para el libro '{item.Titulo}'. Stock disponible: {libro.Stock}");
+                    ModelState.AddModelError("CompraItems", $"¡Error! No hay suficiente stock para el libro '{item.Titulo}'. Stock disponible: {libro.Stock}");
                 }
-            }
-        }
-
-        // Buscar el usuario en la base de datos por su email (UsuarioUserName)
-        var user = _context.ApplicationUsers.FirstOrDefault(au => au.UserName == compraForCreate.UsuarioUserName);
-        if (user == null)
-        {
-            ModelState.AddModelError("UsuarioUserName", "¡Error! El UserName no está registrado");
-        }
-        //busco el metodo de pago en la base de datos usando el ID que viene del DTO (Ej: "Busca en la tabla MetodosPago de la base de datos el registro que tenga el ID 3")
-        var metodoPagoBd = _context.MetodosPago.Find(compraForCreate.MetodoDePago);
-
-        if (metodoPagoBd==null)
-        {
-            ModelState.AddModelError("MetodoDePago", "¡Error! El método de pago seleccionado no es válido");
-        }
-
-
-        
-        if (ModelState.ErrorCount > 0)
-        {
-            return BadRequest(new ValidationProblemDetails(ModelState));
-        }
-
-
-        //---------------BLOQUE 2: (Comprobaciones) ----------------------------------
-        // Extraer los títulos de los libros del DTO para buscarlos en la base de datos
-
-        var titulosLibros = compraForCreate.CompraItems.Select(ci => ci.Titulo).ToList();
-
-        var libros = _context.Libros
-            .Include(l=>l.Genero) //hago estos dos include para que no salga vacio genero y editorial cuando el usuario lo vea
-            .Include(l=>l.Editorial)
-            .Where(l => titulosLibros.Contains(l.Titulo))
-            .ToList();
-
-        //--------------BLOQUE 3. Crear la entidad principal Compra + CompraItems y validar libros------------------------
-        
-        // Actualizamos los datos del perfil del usuario con los introducidos en el formulario de compra
-        // para que luego el GetDetailsForCompras los pueda mostrar correctamente desde c.Usuario
-        
-        //user aqui nunca es null, pq si lo fuera ya habría devuelto el BadRequest en el BLOQUE 1
-        user.Nombre = compraForCreate.Nombre;
-        user.Apellidos = compraForCreate.Apellidos;
-        user.Direccion = compraForCreate.Direccion;
-        user.PhoneNumber = compraForCreate.Telefono;
-
-        Compra compra = new Compra 
-        {
-            Usuario = user,
-            FechaCompra = DateTime.Now,
-            CodigoDescuento = compraForCreate.CodigoDescuento,
-            MetodoPago = metodoPagoBd, //aqui asignamos el objeto MetodoPago obtenido de la base de datos a traves del ID
-            CompraItems = new List<CompraItem>()
-        };
-
-        // Validar existencia de los libros, y asignarle el id, precioCompra, genero y editorial,  y crear los items de compra
-        foreach (var item in compraForCreate.CompraItems) 
-        {
-            var libro = libros.FirstOrDefault(l => l.Titulo == item.Titulo);
-            
-            if (libro == null) 
-            {
-                ModelState.AddModelError("CompraItems", $"¡Error! El libro titulado '{item.Titulo}' no existe en la base de datos");
-            }
-            else 
-            {
-            // Se rellenan con los datos reales de la BD: id, precio, género y editorial (título lo envía el cliente y sirve para buscar el libro)
-            item.LibroID = libro.Id;
-            item.PrecioCompra = (double)libro.PrecioCompra;
-            item.Genero = libro.Genero != null ? libro.Genero.Nombre :string.Empty;
-            item.Editorial = libro.Editorial!=null ? libro.Editorial.Nombre : string.Empty ;
-
-                // Inicializador de objetos: el constructor exige CompraId, que aún no existe porque la compra no se ha insertado
-                var compraItem = new CompraItem
+                else
                 {
-                    LibroId = libro.Id,
-                    Libro = libro,
-                    Cantidad = item.Cantidad,
-                    Compra = compra
-                };
+                    // Se rellenan con los datos reales de la BD: id, precio, género y editorial (el título lo envía el cliente y sirve para buscar el libro)
+                    item.LibroID = libro.Id;
+                    item.PrecioCompra = (double)libro.PrecioCompra;
+                    item.Genero = libro.Genero.Nombre;
+                    item.Editorial = libro.Editorial.Nombre;
+
+                    // Constructor de CompraItem: cantidad, id del libro, id de la compra (0, aún no existe porque la compra no se ha insertado:
+                    // EF Core lo rellena solo al guardar gracias a la referencia a la compra), libro y compra
+                    var compraItem = new CompraItem(
+                        item.Cantidad, 
+                        libro.Id, 
+                        0, 
+                        libro, 
+                        compra
+                    );
 
                     compra.CompraItems.Add(compraItem);
 
-                    libro.Stock= libro.Stock-item.Cantidad;
+                    libro.Stock = libro.Stock - item.Cantidad;
+                }
             }
+
+            // Si ha habido problemas de cantidad, libros inexistentes o stock, no guardamos la compra
+            if (ModelState.ErrorCount > 0)
+            {
+                return BadRequest(new ValidationProblemDetails(ModelState));
+            }
+
+            // Precio total: lo calcula la propiedad PrecioTotal de CompraForCreateDTO (suma de precio × cantidad).
+            // Es fiable porque PrecioCompra de cada item se ha rellenado antes con el precio de la BD
+            compra.PrecioTotal = compraForCreate.PrecioTotal;
+
+            //-----------------------BLOQUE 4: Inserción en la Base de Datos-----------------------------------
+            _context.Add(compra); // no guarda todavía: solo marca la compra para insertarla en el SaveChangesAsync
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                ModelState.AddModelError("Compra", $"¡Error! Hubo un problema al guardar tu compra, por favor inténtalo de nuevo más tarde");
+                return Conflict("Error: " + ex.Message);
+            }
+
+            //-----------BLOQUE 5: devolver 201 + details (paso 7)--------------------
+            // Construyo el DTO de respuesta para el Details usando los datos actualizados del usuario PARA ENSEÑARSELO AL USUARIO QUE LO ACABA DE HACER
+            var compraDetail = new CompraDetailDTO(
+                compra.Id,
+                user.Nombre,
+                user.Apellidos,
+                user.Direccion,
+                user.PhoneNumber,
+                compra.FechaCompra,
+                (decimal)compra.PrecioTotal,
+                compra.MetodoPago.GetType().Name, // para que salga solo "Visa" y no "AppForSEII.API.Models.Visa"
+                compra.CodigoDescuento,
+                compraForCreate.CompraItems
+            );
+
+            return CreatedAtAction("GetDetailsForCompras", new { id = compra.Id }, compraDetail);
         }
+    
 
-        if (ModelState.ErrorCount > 0) 
-        {
-            //en vez de terminar la ejecucion antes si detecto un error, hago que cada vez que haya 
-            //un error este se acumula en un contador de errores y antes de insertar algo erroneo en la base de datos en el 
-            //bloque 4, lo que hago es que si hay 1 error como minimo en el contador de errores (ErrorCount) devuelve 
-            //que ha habido x errores, y si no hay ninguno sigue hacia delante
-            
-            return BadRequest(new ValidationProblemDetails(ModelState));
-        }
 
-        // Precio total: lo calcula la propiedad PrecioTotal de CompraForCreateDTO (suma de precio × cantidad).
-        // Es fiable porque PrecioCompra de cada item se ha rellenado antes con el precio de la BD
-        compra.PrecioTotal = compraForCreate.PrecioTotal; 
-
-        //-----------------------BLOQUE 4: Inserción en la Base de Datos-----------------------------------
-        _context.Add(compra); //no añade a la base de dstos, se asigna la compra a la variable que se conecta a la base de datos para despues guardarla
-
-        try 
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (Exception ex) 
-        {
-        _logger.LogError(ex.Message);
-            ModelState.AddModelError("Compra", $"¡Error! Hubo un problema al guardar tu compra, por favor inténtalo de nuevo más tarde");
-            return Conflict("Error: " + ex.Message);
-        }
-
-        //-----------BLOQUE 5: devolver 201 + details (paso 7)--------------------
-        // Construyo el DTO de respuesta para el Details usando los datos actualizados del usuario PARA ENSEÑARSELO AL USUARIO QUE LO ACABA DE HACER
-        var compraDetail = new CompraDetailDTO(
-            compra.Id,
-            user.Nombre ?? string.Empty,
-            user.Apellidos ?? string.Empty,
-            user.Direccion ?? string.Empty,
-            user.PhoneNumber ?? string.Empty,
-            compra.FechaCompra,
-            (decimal)compra.PrecioTotal,
-            compra.MetodoPago != null ? compra.MetodoPago.GetType().Name : string.Empty, //hago asi el metodo pago para que en vez de que salga por pantalla: "AppForSEII.API.Models.Visa", salga solo "Visa"
-            compra.CodigoDescuento,
-            compraForCreate.CompraItems
-        );
-
-        return CreatedAtAction("GetDetailsForCompras", new { id = compra.Id }, compraDetail);
     }
-
-}
 }

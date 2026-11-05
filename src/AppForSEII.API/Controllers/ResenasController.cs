@@ -65,7 +65,7 @@ namespace AppForSEII.API.Controllers
 public async Task<ActionResult> CreateResena(ResenaForCreateDTO resenaForCreate) 
 {
     // 1. Validaciones previas
-    if (resenaForCreate.ResenaItems == null || resenaForCreate.ResenaItems.Count == 0) // Validar que se incluyan al menos un libro para reseñar
+    if (resenaForCreate.ResenaItems.Count == 0) // Validar que se incluya al menos un libro para reseñar
         ModelState.AddModelError("ResenaItems", "¡Error! Debes incluir al menos un libro para reseñar"); // Agrega un error al ModelState si no se incluyen libros
 
     // Buscar el usuario en la base de datos
@@ -138,9 +138,9 @@ public async Task<ActionResult> CreateResena(ResenaForCreateDTO resenaForCreate)
     // 6. Construir el DTO de respuesta (Details)
     var resenaDetail = new ResenaDetailDTO(
         resena.Id, 
-        user.Nombre ?? string.Empty, 
-        user.Apellidos ?? string.Empty, 
-        user.PhoneNumber ?? string.Empty, 
+        user.Nombre, 
+        user.Apellidos, 
+        user.PhoneNumber, 
         resena.FechaResena, 
         resenaForCreate.ResenaItems
     );

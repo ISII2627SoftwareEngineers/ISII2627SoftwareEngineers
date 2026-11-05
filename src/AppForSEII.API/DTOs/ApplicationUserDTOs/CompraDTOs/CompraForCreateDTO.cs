@@ -62,6 +62,35 @@ namespace AppForSEII.API.DTOs.CompraDTOs
                 return CompraItems.Sum(ci => ci.PrecioCompra * ci.Cantidad); //ci==compra item
             }
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is CompraForCreateDTO dTO &&
+                   UsuarioUserName == dTO.UsuarioUserName &&
+                   Nombre == dTO.Nombre &&
+                   Apellidos == dTO.Apellidos &&
+                   Direccion == dTO.Direccion &&
+                   Telefono == dTO.Telefono &&
+                   MetodoDePago == dTO.MetodoDePago &&
+                   CodigoDescuento == dTO.CodigoDescuento &&
+                   CompraItems.SequenceEqual(dTO.CompraItems) && // Compara el contenido de las listas elemento a elemento (con el Equals de CompraItemDTO), no la referencia
+                   PrecioTotal == dTO.PrecioTotal;
+        }
+
+        public override int GetHashCode()
+        {
+            HashCode hash = new HashCode();
+            hash.Add(UsuarioUserName);
+            hash.Add(Nombre);
+            hash.Add(Apellidos);
+            hash.Add(Direccion);
+            hash.Add(Telefono);
+            hash.Add(MetodoDePago);
+            hash.Add(CodigoDescuento);
+            hash.Add(CompraItems);
+            hash.Add(PrecioTotal);
+            return hash.ToHashCode();
+        }
     }
 }
 

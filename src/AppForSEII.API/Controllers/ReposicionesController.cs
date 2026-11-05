@@ -27,11 +27,6 @@ public class ReposicionesController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public async Task<ActionResult<ReposicionDetailsDTO>> GetReposicionDetails(int id)
     {
-        if (_context.Reposiciones == null)
-        {
-            _logger.LogError("Error: Reposiciones table does not exist");
-            return NotFound();
-        }
 
         _logger.LogInformation("Solicitando detalles de la reposición con ID: {Id}", id);
 
@@ -81,7 +76,7 @@ public class ReposicionesController : ControllerBase
 public async Task<ActionResult> CreateReposicion(ReposicionForCreateDTO reposicionForCreate)
 {
     // Validaciones iniciales
-    if (reposicionForCreate.ReposicionItems == null || reposicionForCreate.ReposicionItems.Count == 0)
+    if (reposicionForCreate.ReposicionItems.Count == 0)
         ModelState.AddModelError("ReposicionItems", "Error! Debes incluir al menos un libro para reponer.");
 
 var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == reposicionForCreate.UsuarioUserName);    if (user == null)

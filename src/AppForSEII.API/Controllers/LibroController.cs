@@ -128,11 +128,6 @@ public async Task<ActionResult> GetLibrosParaResenar(string? tipoLibro, string? 
 [ProducesResponseType((int)HttpStatusCode.NotFound)]
 public async Task<ActionResult> GetLibrosParaReponer(string? genero, string? autor)
 {
-    // Validación crítica de seguridad
-    if (_context.Libros == null)
-    {
-        return NotFound("La tabla de libros no existe.");
-    }
 
     var libros = await _context.Libros
         .Include(l => l.Genero) 

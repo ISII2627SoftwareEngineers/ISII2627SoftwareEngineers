@@ -36,11 +36,21 @@ public class ReposicionDetailsDTO
                NombreUsuario == other.NombreUsuario &&
                Apellidos == other.Apellidos &&
                TelefonoUsuario == other.TelefonoUsuario &&
-               MetodoPago == other.MetodoPago;
+               MetodoPago == other.MetodoPago &&
+               ReposicionItems.SequenceEqual(other.ReposicionItems); // Compara que ambas listas tengan los mismos elementos en el mismo orden
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Id, FechaReposicion, PrecioTotal, NombreUsuario, Apellidos, TelefonoUsuario);
+        var hash = new HashCode();
+        hash.Add(Id);
+        hash.Add(FechaReposicion);
+        hash.Add(PrecioTotal);
+        hash.Add(NombreUsuario);
+        hash.Add(Apellidos);
+        hash.Add(TelefonoUsuario);
+        hash.Add(MetodoPago);
+        hash.Add(ReposicionItems.Count); 
+        return hash.ToHashCode();
     }
 }

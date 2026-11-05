@@ -10,7 +10,7 @@ namespace AppForSEII.API.Models
             CompraItems = new List<CompraItem>(); //Inicializo la lista de CompraItems para evitar null reference exception
         }
 
-        public Compra(int id, DateTime fechaCompra, double precioTotal, string ?codigoDescuento, MetodoPago metodoPago, IList<CompraItem> compraItems, ApplicationUser usuario)
+        public Compra(int id, DateTime fechaCompra, double precioTotal, string? codigoDescuento, MetodoPago metodoPago, IList<CompraItem> compraItems, ApplicationUser usuario)
         {
             Id = id;
             FechaCompra = fechaCompra;

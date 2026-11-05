@@ -265,9 +265,9 @@ namespace AppForSEII.API.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FechaCompra = table.Column<DateTime>(type: "datetime2", nullable: false),
                     PrecioTotal = table.Column<double>(type: "float", nullable: false),
-                    CodigoDescuento = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    MetodoPagoId = table.Column<int>(type: "int", nullable: true),
-                    UsuarioId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    CodigoDescuento = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    MetodoPagoId = table.Column<int>(type: "int", nullable: false),
+                    UsuarioId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -276,12 +276,14 @@ namespace AppForSEII.API.Migrations
                         name: "FK_Compras_AspNetUsers_UsuarioId",
                         column: x => x.UsuarioId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Compras_MetodosPago_MetodoPagoId",
                         column: x => x.MetodoPagoId,
                         principalTable: "MetodosPago",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(

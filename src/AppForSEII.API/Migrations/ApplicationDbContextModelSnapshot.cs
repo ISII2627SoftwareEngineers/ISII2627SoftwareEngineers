@@ -107,20 +107,20 @@ namespace AppForSEII.API.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CodigoDescuento")
-                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTime>("FechaCompra")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("MetodoPagoId")
+                    b.Property<int>("MetodoPagoId")
                         .HasColumnType("int");
 
                     b.Property<double>("PrecioTotal")
                         .HasColumnType("float");
 
                     b.Property<string>("UsuarioId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -532,11 +532,15 @@ namespace AppForSEII.API.Migrations
                 {
                     b.HasOne("AppForSEII.API.Models.MetodoPago", "MetodoPago")
                         .WithMany("Compras")
-                        .HasForeignKey("MetodoPagoId");
+                        .HasForeignKey("MetodoPagoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("AppForSEII.API.Models.ApplicationUser", "Usuario")
                         .WithMany("Compras")
-                        .HasForeignKey("UsuarioId");
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("MetodoPago");
 

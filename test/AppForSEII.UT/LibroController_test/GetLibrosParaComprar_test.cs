@@ -15,26 +15,26 @@ namespace AppForSEII.UT.LibroController_test
             //un objeto tipo Libro necesito un género y una editorial, y 5 libros de prueba
             
             var generos = new List<Genero>() {
-                new Genero(1, "Fantasía", null!),
-                new Genero(2, "Ciencia Ficción", null!),
-                new Genero(3, "Misterio", null!)
+                new Genero(1, "Fantasía", null),
+                new Genero(2, "Ciencia Ficción", null),
+                new Genero(3, "Misterio", null)
             };
 
             var editoriales = new List<Editorial>() {
-                new Editorial(1, "Minotauro", null!),
-                new Editorial(2, "Planeta", null!)
+                new Editorial(1, "Minotauro", null),
+                new Editorial(2, "Planeta", null)
             };
 
 
             // Orden de parámetros del constructor de Libro: id, titulo, tipoLibro, autor, calificacionMedia, fechaLanzamiento,
             // compraItems, resenaItems, reposicionItems, genero, editorial, precioCompra, stock, precioReposicion
             var libros = new List<Libro>() {
-                new Libro(1, "El Imperio Final", "Tapa blanda", "Brandon Sanderson", 4.8, new DateTime(2006, 7, 17), null!, null!, null!, generos[0], editoriales[0], 15.0m, 10, 10.0m),
-                new Libro(2, "Dune", "Bolsillo", "Frank Herbert", 4.5, new DateTime(1965, 8, 1), null!, null!, null!, generos[1], editoriales[0], 12.0m, 5, 8.0m),
-                new Libro(3, "Y no quedó ninguno", "Tapa dura", "Agatha Christie", 4.2, new DateTime(1939, 11, 6), null!, null!, null!, generos[2], editoriales[1], 18.0m, 20, 12.0m),
+                new Libro(1, "El Imperio Final", "Tapa blanda", "Brandon Sanderson", 4.8, new DateTime(2006, 7, 17), null, null, null, generos[0], editoriales[0], 15.0m, 10, 10.0m),
+                new Libro(2, "Dune", "Bolsillo", "Frank Herbert", 4.5, new DateTime(1965, 8, 1), null, null, null, generos[1], editoriales[0], 12.0m, 5, 8.0m),
+                new Libro(3, "Y no quedó ninguno", "Tapa dura", "Agatha Christie", 4.2, new DateTime(1939, 11, 6), null, null, null, generos[2], editoriales[1], 18.0m, 20, 12.0m),
                 // Este libro tiene stock = 0, por lo que NO debe devolverse nunca en GetLibrosParaComprar
-                new Libro(4, "Elantris", "Tapa dura", "Brandon Sanderson", 4.6, new DateTime(2005, 4, 21), null!, null!, null!, generos[0], editoriales[0], 20.0m, 0, 15.0m),
-                new Libro(5, "Neuromante", "Tapa blanda", "William Gibson", 4.1, new DateTime(1984, 7, 1), null!, null!, null!, generos[1], editoriales[1], 25.0m, 3, 18.0m)
+                new Libro(4, "Elantris", "Tapa dura", "Brandon Sanderson", 4.6, new DateTime(2005, 4, 21), null, null, null, generos[0], editoriales[0], 20.0m, 0, 15.0m),
+                new Libro(5, "Neuromante", "Tapa blanda", "William Gibson", 4.1, new DateTime(1984, 7, 1), null, null, null, generos[1], editoriales[1], 25.0m, 3, 18.0m)
             };
 
 
@@ -62,7 +62,7 @@ namespace AppForSEII.UT.LibroController_test
         // Casos de prueba: { genero, precio, lista de DTOs esperada }
         public static IEnumerable<object?[]> TestCasesFor_GetLibrosParaComprar_OK()
         {
-            //A continuación creo la lista de DTOs que representa exactamente los libros 
+            //Ahora creo la lista de DTOs que representa exactamente los libros 
             // que he metido en la BD de prueba
 
             // (Formato del DTO: id, titulo, precioCompra, fechaLanzamiento, genero, editorial)
@@ -118,7 +118,7 @@ namespace AppForSEII.UT.LibroController_test
         public async Task GetLibrosParaComprar_OK_test(string? genero, decimal? precio, IList<LibroParaComprarDTO> expectedLibros) // Recibe los 3 parámetros definidos en cada 'object[]' del método anterior
         {
             // Arrange(preparacion): preparo el controlador con la base de datos de prueba (SQLite), que es el _context que he creado en el constructor
-            var controller = new LibroController(_context, null!);//le paso null al logger porque no lo voy a usar en este test
+            var controller = new LibroController(_context, null);//le paso null al logger porque no lo voy a usar en este test
 
             // Act (accion): llamo al método del controlador que quiero probar(que es GetLibrosParaComprar), pasando los filtros de género y precio
             var result = await controller.GetLibrosParaComprar(genero, precio); //devuelve un IActionResult, que puede ser OkObjectResult o NotFoundResult

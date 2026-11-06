@@ -26,6 +26,18 @@ public class ReposicionDetailsDTO
     public IList<ReposicionItemDTO> ReposicionItems { get; set; } = new List<ReposicionItemDTO>();
 
     public ReposicionDetailsDTO() { }
+
+    public ReposicionDetailsDTO(int id, DateTime fechaReposicion, decimal precioTotal, string nombreUsuario, string apellidos, string telefonoUsuario, string metodoPago, IList<ReposicionItemDTO> reposicionItems)
+    {
+        Id = id;
+        FechaReposicion = fechaReposicion;
+        PrecioTotal = precioTotal;
+        NombreUsuario = nombreUsuario;
+        Apellidos = apellidos;
+        TelefonoUsuario = telefonoUsuario;
+        MetodoPago = metodoPago;
+        ReposicionItems = reposicionItems ?? new List<ReposicionItemDTO>();
+    }
     
     public override bool Equals(object? obj)
     {

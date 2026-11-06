@@ -36,27 +36,21 @@ public class ReposicionesController : ControllerBase
             .Include(r => r.ReposicionItems)
                 .ThenInclude(ri => ri.Libro)
             .Where(r => r.Id == id)
-            .Select(r => new ReposicionDetailsDTO
-            {
-                Id = r.Id,
-                FechaReposicion = r.FechaReposicion,
-                PrecioTotal = r.PrecioTotal,
-                
-                // Mapeo unificado del nombre y los apellidos del usuario
-                NombreUsuario = r.Usuario != null ? r.Usuario.Nombre : string.Empty,
-                Apellidos = r.Usuario != null ? r.Usuario.Apellidos : string.Empty,
-                TelefonoUsuario = r.Usuario != null ? r.Usuario.PhoneNumber : string.Empty,
-                
-                // Mapeo del método de pago único
-                MetodoPago = r.MetodoPago != null ? r.MetodoPago.GetType().Name : string.Empty,
-                
-                ReposicionItems = r.ReposicionItems.Select(ri => new ReposicionItemDTO(
+            .Select(r => new ReposicionDetailsDTO(
+                r.Id,
+                r.FechaReposicion,
+                r.PrecioTotal,
+                r.Usuario != null ? r.Usuario.Nombre : string.Empty,
+                r.Usuario != null ? r.Usuario.Apellidos : string.Empty,
+                r.Usuario != null ? r.Usuario.PhoneNumber : string.Empty,
+                r.MetodoPago != null ? r.MetodoPago.GetType().Name : string.Empty,
+                r.ReposicionItems.Select(ri => new ReposicionItemDTO(
                     ri.LibroId,
                     ri.Libro != null ? ri.Libro.Titulo : string.Empty,
                     ri.Libro != null ? ri.Libro.Autor : string.Empty,
                     ri.CantidadReposicion
                 )).ToList()
-            })
+            ))
             .FirstOrDefaultAsync();
 
         if (reposicionDetails == null)
@@ -111,15 +105,16 @@ var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == reposicio
         .Where(l => libroIds.Contains(l.Id))
         .ToListAsync();
 
-    // Instanciamos la entidad Reposicion (equivalente al Rental del ejemplo)
-    Reposicion reposicion = new Reposicion
-    {
-        FechaReposicion = DateTime.UtcNow,
-        Comentario = reposicionForCreate.Comentario,
-        MetodoPago = metodoPago,
-        Usuario = user,
-        ReposicionItems = new List<ReposicionItem>()
-    };
+    // Instanciamos la entidad Reposicion usando el constructor parametrizado
+    Reposicion reposicion = new Reposicion(
+        0, // ID 0, ya que EF Core lo autogenerará
+        DateTime.UtcNow,
+        0, // Precio total inicializado a 0, se actualizará después
+        reposicionForCreate.Comentario,
+        new List<ReposicionItem>(),
+        metodoPago,
+        user
+    );
 
     decimal precioTotal = 0;
 
@@ -132,6 +127,11 @@ var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == reposicio
         {
             ModelState.AddModelError("ReposicionItems", $"Error! El libro con ID '{item.LibroId}' no existe en la base de datos.");
         }
+        //Solo se puede reponer libros con stock = 0
+        else if (libro.Stock > 0)
+        {
+            ModelState.AddModelError("ReposicionItems", $"Error! El libro '{libro.Titulo}' ya tiene stock disponible ({libro.Stock} unidades) y no requiere reposición.");
+        }
         // Requisito 5: La cantidad de reposición debe ser un valor mayor que 1
         else if (item.Cantidad <= 1) 
         {
@@ -140,12 +140,13 @@ var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == reposicio
         else
         {
             // Vinculamos la relación
-            reposicion.ReposicionItems.Add(new ReposicionItem
-            {
-                LibroId = libro.Id,
-                Reposicion = reposicion,
-                CantidadReposicion = item.Cantidad
-            });
+            reposicion.ReposicionItems.Add(new ReposicionItem(
+                item.Cantidad, // cantidadReposicion
+                libro.Id,      // libroId
+                libro,         // libro
+                reposicion,    // reposicion
+                reposicion.Id  // reposicionId
+            ));
 
             // Calculamos el precio basándonos en el dato seguro de la BD, no del cliente
             precioTotal += libro.PrecioReposicion * item.Cantidad;

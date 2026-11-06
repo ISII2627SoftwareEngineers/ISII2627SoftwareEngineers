@@ -30,21 +30,26 @@ namespace AppForSEII.API.Controllers
         {
 
 
-            var compra = await _context.Compras //creo un objeto compra que contiene todos los datos de la compra con el id especificado, incluyendo los datos del usuario y los libros comprados
+            var compra = await _context.Compras //creo un objeto compra, y voy a asignarle una compra, accediendo a la base de datos por _context.Compras  
                .Where(c => c.Id == id) //filtro con where para que solo devuelva la compra con el id especificado
 
 
+                // 2. Primeros saltos directos (Include) desde Compras hacia sus relaciones directas
 
-               .Include(c => c.Usuario) // hago el Join con ApplicationUser, que el join era que unia la tabla Compras con la tabla ApplicationUser, mediante la columna UsuarioId de la tabla Compras y la columna Id de la tabla ApplicationUser, para poder acceder a los datos del usuario que hizo la compra (para obtener las columnas Nombre, Apellidos, Direccion y Telefono del usuario que hizo la compra)
-               .Include(c => c.CompraItems) // Join de compra con CompraItem, que es la tabla intermedia que relaciona Compras con Libros, para poder acceder a los libros comprados en esa compra mediante la columna CompraId de la tabla CompraItem y la columna Id de la tabla Compras (para obtener el los libros comprados en una compra específica)
-                   .ThenInclude(ci => ci.Libro) // Join con la tabla Libro para obtener el título, género y editorial de cada libro comprado, mediante la columna LibroId de la tabla CompraItem y la columna Id de la tabla Libro (para obtener el título, género y editorial de cada libro comprado en una compra específica)
-                       .ThenInclude(l => l.Genero) // Join con Genero del libro
-               .Include(c => c.CompraItems) // lo vuelvo a incluir para poder hacer el join con Editorial del libro, ya que no se puede hacer un ThenInclude de un ThenInclude
-                   .ThenInclude(ci => ci.Libro) //
-                       .ThenInclude(l => l.Editorial) // Join con Editorial del libro
+               .Include(c => c.Usuario) // Trae los datos del usuario que realizó la compra a traves de UsuarioId (FK) de la tabla Compras
+
+                // 3. Primer camino: Viajamos por CompraItems y Libro para llegar al Género de id especificado
+               .Include(c => c.CompraItems) 
+                   .ThenInclude(ci => ci.Libro) //paso por la tabla libros...
+                       .ThenInclude(l => l.Genero) //...para quedarme con el genero del libro con el id especificado 
+
+                // 4. Segundo camino: Viajamos por CompraItems y Libro para llegar a la Editorial de id especificado
+               .Include(c => c.CompraItems) 
+                   .ThenInclude(ci => ci.Libro) 
+                       .ThenInclude(l => l.Editorial) 
 
 
-
+                //si no hago el select, me devuelve un objeto gigante con todos los datos de todas las tablas(por ello hago los DTOs para filtrar y empaquetar solo lo que necesito)
                .Select(c => new CompraDetailDTO(
                    c.Id,
                    // Validamos que el usuario no sea nulo antes de coger sus datos (evita warnings y errores)
@@ -62,19 +67,32 @@ namespace AppForSEII.API.Controllers
                            ci.Libro != null ? ci.Libro.Titulo : string.Empty,
                            ci.Libro != null && ci.Libro.Genero != null ? ci.Libro.Genero.Nombre : string.Empty,
                            ci.Libro != null && ci.Libro.Editorial != null ? ci.Libro.Editorial.Nombre : string.Empty
-                       )).ToList<CompraItemDTO>()
+                       )).ToList<CompraItemDTO>() //une todas las instacias de CompraItemDTO en una lista para que el CompraDetailDTO final tenga la lista de libros comprados
                ))
-               .FirstOrDefaultAsync();
+               .FirstOrDefaultAsync(); // Devuelve el objeto encontrado (que contiene una lista de compraItems (libros))) o null si no hay compras con el id especificado
 
-            if (compra == null) // Si no se encuentra la compra, devolvemos un 404 Not Found
-            {
-                _logger.LogError($"Error: Compra with id {id} does not exist");
-                return NotFound();
-            }
+                if (compra == null) // Si no se encuentra la compra con el id especificado, devolvemos un 404 Not Found
+                {
+                    _logger.LogError($"Error: Compra with id {id} does not exist");
+                    return NotFound();
+                }
 
-            return Ok(compra);
+            return Ok(compra); // Si se encuentra la compra, devolvemos un 200 OK con el objeto CompraDetailDTO
         }
     
+        //Explicacion del .select
+        /*
+        A partir de la fila gigante obtenida al unir las tablas en la base de datos (haciendo .Include() y .ThenInclude()), 
+        utilizamos el .Select() para filtrar y empaquetar los datos necesarios según 
+        el flujo de detalles(lo que pide en el parrafo del detail), instanciando 
+        un objeto CompraDetailDTO que contendrá la información del cliente, la fecha, 
+        el precio total, el método de pago y el código de descuento.
+
+        Y anidando a su vez 
+        una lista de CompraItemDTO construida mediante otro .Select() interno dentro del constructor de CompraDetailDTO,
+        que recorre cada línea de compra para extraer el ID, el título, el género y la editorial de cada 
+        libro, devolviendo finalmente el recurso completo y limpio al usuario.
+        */
 
     
 

@@ -98,8 +98,8 @@ public async Task<ActionResult> GetLibrosParaResenar(string? tipoLibro, string? 
                     l.Titulo,
                     l.PrecioCompra,
                     l.FechaLanzamiento,
-                    l.Genero != null ? l.Genero.Nombre : string.Empty,
-                    l.Editorial != null ? l.Editorial.Nombre : string.Empty
+                    l.Genero.Nombre ,
+                    l.Editorial.Nombre
                 ))
                 .ToListAsync();
 

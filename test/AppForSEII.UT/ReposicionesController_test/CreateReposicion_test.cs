@@ -21,6 +21,9 @@ namespace AppForSEII.UT.ReposicionesController_test
         private const string _phone = "123456789";
 
         private const string _libroTitulo = "El Imperio Final";
+        
+        private const string _libroConStockTitulo = "El Archivo de las Tormentas"; 
+        
         private const string _libroGenero = "Fantasía";
         private const string _libroEditorial = "Minotauro";
 
@@ -30,25 +33,36 @@ namespace AppForSEII.UT.ReposicionesController_test
             var genero = new Genero(1, _libroGenero, null!);
             var editorial = new Editorial(1, _libroEditorial, null!);
             
+            // Libro 1: Stock 0 (Válido para reponer)
             var libro = new Libro(1, _libroTitulo, "Tapa blanda", "Brandon Sanderson", 4.8, new DateTime(2006, 7, 17), null!, null!, null!, genero, editorial, 15.0m, 0, 10.0m);
+            
+            // Libro 2 con Stock 5 (Inválido para reponer)
+            var libroConStock = new Libro(2, _libroConStockTitulo, "Tapa dura", "Brandon Sanderson", 4.9, new DateTime(2010, 8, 31), null!, null!, null!, genero, editorial, 20.0m, 5, 12.0m);
 
-            var user = new ApplicationUser 
-            { 
-                Id = "1", 
-                Nombre = _customerName, 
-                Apellidos = _customerSurname, 
-                UserName = _userName, 
-                PhoneNumber = _phone 
-            };
+           // Vinculamos las propiedades a través del constructor parametrizado
+            var user = new ApplicationUser(
+                _customerName, 
+                _customerSurname, 
+                "Dirección de prueba",
+                _phone, 
+                new List<Resena>(), 
+                new List<Compra>(), 
+                new List<Reposicion>()
+            );
+            user.Id = "1";
+            user.UserName = _userName;
 
-            var metodoPagoValido = new Visa { Id = 1, NumeroTarjeta = "12345678" };
-            var metodoPagoInvalido = new Visa { Id = 4, NumeroTarjeta = "00000000" }; // ID 4 para forzar el error de validación (1, 2 o 3)
-
+            var visa1 = new Visa("12345678", new DateTime(2030, 12, 31)); // Obtendrá el Id = 1 (Válido)
+            var visa2 = new Visa("11111111", new DateTime(2030, 12, 31)); // Obtendrá el Id = 2 (Válido)
+            var visa3 = new Visa("22222222", new DateTime(2030, 12, 31)); // Obtendrá el Id = 3 (Válido)
+            var visa4 = new Visa("00000000", new DateTime(2030, 12, 31)); // Obtendrá el Id = 4 (Inválido para tu lógica)
+            
             _context.Generos.Add(genero);
             _context.Editoriales.Add(editorial);
             _context.Libros.Add(libro);
+            _context.Libros.Add(libroConStock);
             _context.Users.Add(user);
-            _context.Set<MetodoPago>().AddRange(new List<MetodoPago> { metodoPagoValido, metodoPagoInvalido });
+            _context.Set<MetodoPago>().AddRange(new List<MetodoPago> { visa1, visa2, visa3, visa4 });
             _context.SaveChanges();
         }
 
@@ -56,8 +70,11 @@ namespace AppForSEII.UT.ReposicionesController_test
         public static IEnumerable<object[]> TestCasesFor_CreateReposicion() 
         {
             var itemCorrecto = new ReposicionItemDTO(1, _libroTitulo, "Brandon Sanderson", 10);
-            var itemCantidadInvalida = new ReposicionItemDTO(1, _libroTitulo, "Brandon Sanderson", 1); // Cantidad <= 1
-            var itemLibroFalso = new ReposicionItemDTO(99, "Libro Inventado", "Autor Falso", 10); // Libro 99 no existe
+            var itemCantidadInvalida = new ReposicionItemDTO(1, _libroTitulo, "Brandon Sanderson", 1);
+            var itemLibroFalso = new ReposicionItemDTO(99, "Libro Inventado", "Autor Falso", 10);
+            
+            // Ítem apuntando al ID 2 (El libro que ya tiene 5 unidades de stock)
+            var itemConStock = new ReposicionItemDTO(2, _libroConStockTitulo, "Brandon Sanderson", 10); 
 
             // Caso 1: Sin ítems en la lista
             var repoSinItems = new ReposicionForCreateDTO(_userName, _customerName, _customerSurname, _phone, 1, "Comentario", new List<ReposicionItemDTO>());
@@ -77,6 +94,9 @@ namespace AppForSEII.UT.ReposicionesController_test
             // Caso 6: La cantidad de reposición es menor o igual a 1
             var repoCantidadInvalida = new ReposicionForCreateDTO(_userName, _customerName, _customerSurname, _phone, 1, "Comentario", new List<ReposicionItemDTO> { itemCantidadInvalida });
 
+            // Caso 7 (Flujo 0) - Reponer un libro que ya tiene stock
+            var repoLibroConStock = new ReposicionForCreateDTO(_userName, _customerName, _customerSurname, _phone, 1, "Comentario", new List<ReposicionItemDTO> { itemConStock });
+
             return new List<object[]> 
             {
                 new object[] { repoSinItems, "Error! Debes incluir al menos un libro para reponer." },
@@ -85,6 +105,7 @@ namespace AppForSEII.UT.ReposicionesController_test
                 new object[] { repoMetodoInvalido, "Error! El método de pago debe ser Visa, GooglePay o PayPal." },
                 new object[] { repoLibroNoExiste, "Error! El libro con ID '99' no existe en la base de datos." },
                 new object[] { repoCantidadInvalida, $"Error! La cantidad a reponer para el libro '{_libroTitulo}' debe ser mayor a 1." },
+                new object[] { repoLibroConStock, $"Error! El libro '{_libroConStockTitulo}' ya tiene stock disponible (5 unidades) y no requiere reposición." },
             };
         }
 
@@ -131,13 +152,8 @@ namespace AppForSEII.UT.ReposicionesController_test
             // Assert
             var createdResult = Assert.IsType<CreatedAtActionResult>(result);
             
-            // Validamos que el controlador redirige al método GetReposicionDetails con el ID recién creado
             Assert.Equal("GetReposicionDetails", createdResult.ActionName);
             Assert.True(createdResult.RouteValues!.ContainsKey("id"));
-            
-            // Siendo críticos con tu código del controlador: 
-            // Tu método devuelve CreatedAtAction(nameof(...), new { id }, NULL);
-            // Al devolver null explícitamente, no podemos asertar el DTO en el Value, por lo que asertamos que es nulo.
             Assert.Null(createdResult.Value);
         }
     }

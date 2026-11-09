@@ -18,7 +18,10 @@ namespace AppForSEII.UT.ReposicionesController_test
         private const string _userName = "admin@uclm.es";
         private const string _customerName = "Elena";
         private const string _customerSurname = "Navarro Martínez";
-        private const string _phone = "123456789";
+        private const string _phone = "+34123456789";
+
+        private const string _phone2 = "123456789";
+
 
         private const string _libroTitulo = "El Imperio Final";
         
@@ -97,6 +100,11 @@ namespace AppForSEII.UT.ReposicionesController_test
             // Caso 7 (Flujo 0) - Reponer un libro que ya tiene stock
             var repoLibroConStock = new ReposicionForCreateDTO(_userName, _customerName, _customerSurname, _phone, 1, "Comentario", new List<ReposicionItemDTO> { itemConStock });
 
+            var reposicionTelefono = new ReposicionForCreateDTO(
+                _userName, _customerName, _customerSurname, _phone2, 1, "Reposición mensual", 
+                new List<ReposicionItemDTO> { new ReposicionItemDTO(1, _libroTitulo, "Brandon Sanderson", 10) }
+            );
+
             return new List<object[]> 
             {
                 new object[] { repoSinItems, "Error! Debes incluir al menos un libro para reponer." },
@@ -106,6 +114,8 @@ namespace AppForSEII.UT.ReposicionesController_test
                 new object[] { repoLibroNoExiste, "Error! El libro con ID '99' no existe en la base de datos." },
                 new object[] { repoCantidadInvalida, $"Error! La cantidad a reponer para el libro '{_libroTitulo}' debe ser mayor a 1." },
                 new object[] { repoLibroConStock, $"Error! El libro '{_libroConStockTitulo}' ya tiene stock disponible (5 unidades) y no requiere reposición." },
+                new object[] { reposicionTelefono, "¡Error!, el teléfono debe empezar por +34" },
+
             };
         }
 

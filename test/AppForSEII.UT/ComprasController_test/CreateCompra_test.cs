@@ -17,7 +17,7 @@ namespace AppForSEII.UT.ComprasController_test
         private const string _userName = "elena.navarro@uclm.es";
         private const string _nombre = "Elena";
         private const string _apellidos = "Navarro Martínez";
-        private const string _direccion = "Avda. España s/n, Albacete 02071";
+        private const string _direccion = "Calle Avda. España s/n, Albacete 02071"; //MODIFICADO
         private const string _telefono = "600123456";
         private const string _codigoDescuento = "DESC12345"; //opcional segun el parrafo 5 del flujo basico
 
@@ -111,6 +111,13 @@ namespace AppForSEII.UT.ComprasController_test
             var compraMetodoPagoInvalido = new CompraForCreateDTO(_userName, _nombre, _apellidos, _direccion,
                 _telefono, _metodoPagoInvalido, _codigoDescuento, itemValido);
 
+            //-----------------------------------------------------------------------------------------------------------------------
+            //NUEVO CASO AÑADIDO
+            // Caso 7: Calle introducida invalida
+            var compraCalleInvalida = new CompraForCreateDTO(_userName, _nombre, _apellidos, "Carretera que no existe",
+                _telefono, _metodoPagoValido, _codigoDescuento, itemValido);
+            //-----------------------------------------------------------------------------------------------------------------------
+
             // Empaquetamos todos los casos de prueba en un IEnumerable<object[]>
             var allTests = new List<object[]>
             {   // entrada de CreateCompra - mensaje de error esperado
@@ -120,6 +127,10 @@ namespace AppForSEII.UT.ComprasController_test
                 new object[] { compraStockInsuficiente, "¡Error! No hay suficiente stock para el libro 'El Hobbit'. Stock disponible: 3" },
                 new object[] { compraUsuarioNoRegistrado, "¡Error! El UserName no está registrado" },
                 new object[] { compraMetodoPagoInvalido, "¡Error! El método de pago seleccionado no es válido" },
+                //--------------------------------------------------------------------------------------------------------------------
+                //NUEVO
+                new object[] { compraCalleInvalida, "¡Error! La dirección de envío debe contener la palabra Calle." },
+                //--------------------------------------------------------------------------------------------------------------------
             };
 
             return allTests;

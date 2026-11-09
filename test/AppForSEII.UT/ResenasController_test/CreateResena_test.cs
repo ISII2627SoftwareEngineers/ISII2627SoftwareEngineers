@@ -51,19 +51,22 @@ namespace AppForSEII.UT.ResenasController_test {
 
         // 3. Creamos un método que nos devuelva los casos de prueba para el test de creación de reseñas
         public static IEnumerable<object[]> TestCasesFor_CreateResena() {
-    var resenaNoItem = new ResenaForCreateDTO(_userName, _customerName, _customerSurname, _deliveryAddress, _phone, "Reseña de novelas de aventuras", new List<ResenaItemDTO>()); // Caso 1:Intentar crear una reseña sin añadir ningún libro
+    var resenaNoItem = new ResenaForCreateDTO(_userName, _customerName, _customerSurname, _deliveryAddress, _phone, "Reseña: novelas de aventuras", new List<ResenaItemDTO>()); // Caso 1:Intentar crear una reseña sin añadir ningún libro
 
     var resenaItems = new List<ResenaItemDTO>() { new ResenaItemDTO(1, _libroTitulo, _libroEditorial, "Tapa blanda", 5, "Un libro increíble, me ha encantado!") }; // Caso 1
 
-    var resenaUsuarioNoRegistrado = new ResenaForCreateDTO("ruben.sanchez@uclm.es", _customerName, _customerSurname, _deliveryAddress, _phone, "Mis lecturas del mes", resenaItems); // Caso 2: Intentar crear una reseña con un UserName que no está registrado en la base de datos
+    var resenaUsuarioNoRegistrado = new ResenaForCreateDTO("ruben.sanchez@uclm.es", _customerName, _customerSurname, _deliveryAddress, _phone, "Reseña: Mis lecturas del mes", resenaItems); // Caso 2: Intentar crear una reseña con un UserName que no está registrado en la base de datos
 
-    var resenaLibroNoExiste = new ResenaForCreateDTO(_userName, _customerName, _customerSurname, _deliveryAddress, _phone, "Excelente selección de libros", new List<ResenaItemDTO>() { new ResenaItemDTO(1, "Libro Inventado", "Editorial Falsa", "Tapa blanda", 5, "Test") }); // Caso 3: Intentar crear una reseña con un libro que no existe en la base de datos
+    var resenaLibroNoExiste = new ResenaForCreateDTO(_userName, _customerName, _customerSurname, _deliveryAddress, _phone, "Reseña: Excelente selección de libros", new List<ResenaItemDTO>() { new ResenaItemDTO(1, "Libro Inventado", "Editorial Falsa", "Tapa blanda", 5, "Test") }); // Caso 3: Intentar crear una reseña con un libro que no existe en la base de datos
+
+    var resenaTituloErroneo = new ResenaForCreateDTO(_userName, _customerName, _customerSurname, _deliveryAddress, _phone, "Me ha encantado!", resenaItems);
 
     var allTests = new List<object[]> // Emparejamos cada caso de prueba con el mensaje de error esperado que debería devolver el controlador
     {
         new object[] { resenaNoItem, "¡Error! Debes incluir al menos un libro para reseñar" },
         new object[] { resenaUsuarioNoRegistrado, "¡Error! El UserName no está registrado" },
         new object[] { resenaLibroNoExiste, "¡Error! El libro titulado 'Libro Inventado' no existe en la base de datos" },
+        new object[] { resenaTituloErroneo, "¡Error! El título de la reseña debe empezar por Reseña:"}
     };
 
     return allTests;
@@ -105,7 +108,7 @@ namespace AppForSEII.UT.ResenasController_test {
             var controller = new ResenasController(_context, logger);
 
             var resenaDTO = new ResenaForCreateDTO(_userName, _customerName, _customerSurname, // Creamos un DTO válido para crear una reseña
-                _deliveryAddress, _phone, "Mis lecturas del mes", new List<ResenaItemDTO>()
+                _deliveryAddress, _phone, "Reseña: Mis lecturas del mes", new List<ResenaItemDTO>()
                 { new ResenaItemDTO(1, _libroTitulo, _libroEditorial, "Tapa blanda", 5, "Un libro increíble, me ha encantado!") });
 
             // Act

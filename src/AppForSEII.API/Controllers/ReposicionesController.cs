@@ -94,6 +94,12 @@ var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == reposicio
 
 }
 
+        if (!reposicionForCreate.Telefono.StartsWith("+34"))
+        {
+            ModelState.AddModelError("Telefono", "¡Error!, el teléfono debe empezar por +34");
+
+        }
+
     // Si hay errores iniciales, cortamos la ejecución
     if (ModelState.ErrorCount > 0)
         return BadRequest(new ValidationProblemDetails(ModelState));

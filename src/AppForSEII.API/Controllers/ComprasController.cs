@@ -117,6 +117,21 @@ namespace AppForSEII.API.Controllers
                 ModelState.AddModelError("CompraItems", "¡Error! Debes incluir al menos un libro para realizar la compra");
             }
 
+
+
+
+            
+            //----------------------------------------------------------------------------------------------------------------------
+            //NUEVO CASO AÑADIDO
+            if (!compraForCreate.Direccion.Contains("Calle"))
+            {
+                ModelState.AddModelError("Direccion", "¡Error! La dirección de envío debe contener la palabra Calle.");
+            }
+            //-----------------------------------------------------------------------------------------------------------------------
+
+
+
+
             // Buscar el usuario en la base de datos por su email (UsuarioUserName)
             var user = _context.ApplicationUsers.FirstOrDefault(au => au.UserName == compraForCreate.UsuarioUserName);
             if (user == null)

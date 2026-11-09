@@ -68,6 +68,10 @@ public async Task<ActionResult> CreateResena(ResenaForCreateDTO resenaForCreate)
     if (resenaForCreate.ResenaItems.Count == 0) // Validar que se incluya al menos un libro para reseñar
         ModelState.AddModelError("ResenaItems", "¡Error! Debes incluir al menos un libro para reseñar"); // Agrega un error al ModelState si no se incluyen libros
 
+    if (!resenaForCreate.TituloResena.StartsWith("Reseña:")) {
+        ModelState.AddModelError("TituloResena", "¡Error! El título de la reseña debe empezar por Reseña:");        
+            }
+
     // Buscar el usuario en la base de datos
     var user = _context.ApplicationUsers.FirstOrDefault(au => au.UserName == resenaForCreate.UsuarioUserName); // Busca el usuario en la base de datos por su UserName
     if (user == null) // Si no se encuentra el usuario, agrega un error al ModelState

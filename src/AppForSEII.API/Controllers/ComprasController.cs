@@ -112,7 +112,7 @@ namespace AppForSEII.API.Controllers
         public async Task<ActionResult> CreateCompra(CompraForCreateDTO compraForCreate)
         {
             // -----------------BLOQUE 1. Validaciones previas de entrada (lista de libros, usuario y método de pago)--------------------
-            if (compraForCreate.CompraItems == null || compraForCreate.CompraItems.Count == 0)
+            if (compraForCreate.CompraItems.Count == 0)
             {
                 ModelState.AddModelError("CompraItems", "¡Error! Debes incluir al menos un libro para realizar la compra");
             }

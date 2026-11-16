@@ -17,6 +17,7 @@ namespace AppForSEII.API.Controllers
         {
             _context = context;
             _logger = logger;
+            _logger.LogInformation("ResenasController initialized");
         }
 
         [HttpGet] // Define que este método responde a solicitudes HTTP GET
@@ -50,7 +51,7 @@ namespace AppForSEII.API.Controllers
 
             if (resena == null) // Si no se encuentra la reseña con el ID proporcionado, devuelve un estado HTTP 404 Not Found
             {
-                _logger.LogError($"Error: La reseña con id {id} no existe"); // Registra un error en el logger indicando que la reseña no existe
+                _logger.LogWarning("La reseña con id {Id} no existe en la base de datos.", id);
                 return NotFound(); // Devuelve un estado HTTP 404 Not Found
             }
 
@@ -130,7 +131,7 @@ public async Task<ActionResult> CreateResena(ResenaForCreateDTO resenaForCreate)
     }
     catch (Exception ex) 
     {
-        _logger.LogError(ex.Message); // Registra el mensaje de error en el logger
+        _logger.LogError(ex, "Error al guardar la reseña en la base de datos");
         ModelState.AddModelError("Resena", $"¡Error! Hubo un problema al guardar tu reseña, por favor inténtalo de nuevo más tarde"); // Agrega un error al ModelState indicando que hubo un problema al guardar la reseña
         return Conflict("Error: " + ex.Message); // Devuelve un estado HTTP 409 Conflict con el mensaje de error
     }
@@ -145,6 +146,7 @@ public async Task<ActionResult> CreateResena(ResenaForCreateDTO resenaForCreate)
         resenaForCreate.ResenaItems
     );
 
+    _logger.LogInformation("Reseña {Id} creada satisfactoriamente por el usuario {UserName}", resena.Id, user.UserName);
     return CreatedAtAction("GetDetailsForResenas", new { id = resena.Id }, resenaDetail); // Devuelve un estado HTTP 201 Created con la ruta para obtener los detalles de la reseña recién creada y el objeto ResenaDetailDTO
 }
     }

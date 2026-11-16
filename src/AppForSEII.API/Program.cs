@@ -1,5 +1,6 @@
 using Microsoft.Data.Sqlite;
 using System.Data.Common;
+using AppForSEII.API.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,8 @@ builder.Services.AddControllers()
 
 // Add service for managing a sqlserver database that will be managed using ApplicationDBContext
 // the connection to the database was defined in appsettings
+
+builder.Logging.AddRabbitMQ(builder.Configuration.GetSection("RabbitMQ")); //”RabbiMQ” coincide con el nombre del bloque de propiedades en appsettings.json
 
 string? connection2Database = Environment.GetEnvironmentVariable("DBConnection2Use");
 

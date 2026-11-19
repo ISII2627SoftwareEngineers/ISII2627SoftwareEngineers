@@ -1,0 +1,177 @@
+@page "/resenas/listlibrospararesenar"
+@using AppForSEII.Web.API
+@using Microsoft.AspNetCore.Authorization
+
+@inject ILogger<ListLibrosParaResenar> logger
+@inject AppForSEIIAPIClient apiservice
+@inject ResenaStateContainer resenaState
+@inject NavigationManager navigation
+
+@attribute [Authorize]
+
+<h3>Seleccionar libros para reseñar</h3>
+<div class="container-fluid">
+
+    <div class="row">
+        @if (!string.IsNullOrEmpty(messageError))
+        {
+            <div class="row alert alert-danger" role="alert" id="MessageError">
+                @messageError
+            </div>
+        }
+        <div class="d-flex justify-content-between">
+            <div><b>Libros seleccionados:</b> @resena.ResenaItems.Count</div>
+            <div>
+                <button class="btn btn-outline-primary" id="showResenaCart" @onclick="@ToggleResenaCart">
+                    Lista de reseña (@resena.ResenaItems.Count)
+                </button>
+            </div>
+            <button class="btn btn-primary" id="HacerResena" @onclick="@HacerResena" disabled="@resenaButtonDisabled">
+                Hacer reseña
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <p></p>
+        <h5>Filtrar libros</h5>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Tipo de libro</span>
+            </div>
+            <input type="text" class="form-control" @bind="tipoLibro" id="tipoLibro">
+
+            <div class="input-group-prepend">
+                <span class="input-group-text">Género</span>
+            </div>
+            <input type="text" class="form-control" @bind="genero" id="genero">
+
+            <div class="input-group-append">
+                <button class="btn btn-outline-primary" id="searchLibros" @onclick="@SearchLibros">
+                    Buscar libros
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between mt-3">
+        <div class="container-fluid">
+            @if (libros == null || libros.Count() == 0)
+            {
+                <p><em>No hay libros disponibles para reseñar</em></p>
+            }
+            else
+            {
+                <div class="mh-100 table-responsive">
+                    <table class="table table-condensed table-hover" id="TableOfLibros">
+                        <thead>
+                            <tr>
+                                <th>Título</th>
+                                <th>Tipo de libro</th>
+                                <th>Género</th>
+                                <th>Editorial</th>
+                                <th>Autor</th>
+                                <th>Calificación media</th>
+                                <th>Fecha de lanzamiento</th>
+                                <th>Reseñar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var libro in libros)
+                            {
+                                <tr id="LibroData_@libro.Titulo">
+                                    <td>@libro.Titulo</td>
+                                    <td>@libro.TipoLibro</td>
+                                    <td>@libro.Genero</td>
+                                    <td>@libro.Editorial</td>
+                                    <td>@libro.Autor</td>
+                                    <td>@libro.CalificacionMedia</td>
+                                    <td>@libro.FechaLanzamiento.DateTime.ToShortDateString()</td>
+                                    <td>
+                                        <button class="btn btn-outline-secondary" id="libroToResena_@libro.Titulo" @onclick="@(() => AddLibro(libro))">
+                                            Añadir
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+
+        @if (showResenaCart)
+        {
+            <div class="col-md-3">
+                <div class="d-grid gap-2">
+                    <h4>Libros a reseñar</h4>
+                    @foreach (ResenaItemDTO item in resena.ResenaItems)
+                    {
+                        <button type="button" class="btn btn-outline-secondary" id="LibroSelected_@item.Titulo" @onclick="@(() => RemoveResenaItem(item))">
+                            @item.Titulo (@item.Editorial)
+                        </button>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+</div>
+
+@code {
+    private ICollection<LibroParaResenarDTO>? libros { get; set; } = new List<LibroParaResenarDTO>();
+    private string? tipoLibro;
+    private string? genero;
+
+    private ResenaForCreateDTO resena => resenaState.Resena;
+
+    private string messageError = string.Empty;
+    private bool resenaButtonDisabled => resena.ResenaItems.Count == 0;
+    private bool showResenaCart = false;
+
+    private void ToggleResenaCart()
+    {
+        showResenaCart = !showResenaCart;
+    }
+
+    private void AddLibro(LibroParaResenarDTO libro)
+    {
+        resenaState.AddLibroToResena(libro);
+    }
+
+    private void RemoveResenaItem(ResenaItemDTO item)
+    {
+        resenaState.RemoveResenaItem(item);
+        if (resena.ResenaItems.Count == 0) showResenaCart = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await SearchLibros();
+    }
+
+    protected async Task SearchLibros()
+    {
+        messageError = string.Empty;
+        try
+        {
+            string? filtroTipo = string.IsNullOrWhiteSpace(tipoLibro) ? null : tipoLibro;
+            string? filtroGenero = string.IsNullOrWhiteSpace(genero) ? null : genero;
+
+            libros = await apiservice.GetLibrosParaResenarAsync(filtroTipo, filtroGenero);
+        }
+        catch (ApiException ex)
+        {
+            libros = new List<LibroParaResenarDTO>();
+            messageError = "Error al conectar con el servicio de libros.";
+            logger.LogError(ex, "Error! There was an error while connecting to the GetLibrosParaResenarAsync service");
+        }
+
+        StateHasChanged();
+    }
+
+    private void HacerResena()
+    {
+        navigation.NavigateTo("/resenas/createresena");
+    }
+}

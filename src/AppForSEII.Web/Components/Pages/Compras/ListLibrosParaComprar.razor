@@ -1,0 +1,191 @@
+@page "/compras/listlibrosparacomprar"
+@using AppForSEII.Web.API
+@using Microsoft.AspNetCore.Authorization
+
+@inject ILogger<ListLibrosParaComprar> logger
+@inject IAppForSEIIAPIClient apiservice
+@inject CompraStateContainer compraState
+@inject NavigationManager navigation
+
+@attribute [Authorize]
+
+<PageTitle>Comprar libros</PageTitle>
+
+<h3>Seleccionar libros para comprar</h3>
+<div class="container-fluid">
+
+    @* 1. Mensajes de error / aviso *@
+    @if (!string.IsNullOrEmpty(messageError))
+    {
+        <div class="row alert alert-danger" role="alert" id="MessageError">
+            @messageError
+        </div>
+    }
+
+    @* 2. Resumen del carrito y acciones (flujo alternativo 2: botón desactivado si no hay libros) *@
+    <div class="row">
+        <div class="d-flex justify-content-between">
+            <div><b>Libros seleccionados:</b> @compra.CompraItems.Count</div>
+            <div>
+                <button class="btn btn-outline-primary" id="showCompraCart" @onclick="@ToggleCompraCart">
+                    Carrito: @compra.PrecioTotal.ToString("0.00") €
+                </button>
+            </div>
+            <button class="btn btn-primary" id="Comprar" @onclick="@ComprarLibros" disabled="@comprarButtonDisabled">
+                Comprar libro
+            </button>
+        </div>
+    </div>
+
+    @* 3. Filtros (flujo alternativo 1: filtrar por género y precio) *@
+    <div class="row">
+        <p></p>
+        <h5>Filtrar libros</h5>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Género</span>
+            </div>
+            <input type="text" class="form-control" @bind="libroGenero" id="libroGenero" />
+
+            <div class="input-group-prepend">
+                <span class="input-group-text">Precio máximo</span>
+            </div>
+            <input type="number" step="0.01" min="0" class="form-control" @bind="libroPrecio" id="libroPrecio" />
+
+            <div class="input-group-append">
+                <button class="btn btn-outline-primary" id="searchLibros" @onclick="@SearchLibros">Buscar libros</button>
+            </div>
+        </div>
+    </div>
+
+    @* 4. Resultados + carrito *@
+    <div class="d-flex justify-content-between">
+        <div class="container-fluid">
+            @if (libros.Count == 0)
+            {
+                @* Flujo alternativo 0: no hay libros disponibles *@
+                <p id="NoLibros"><em>No hay libros disponibles para comprar</em></p>
+            }
+            else
+            {
+                <div class="mh-100 table-responsive">
+                    <table class="table table-condensed table-hover" id="TableOfLibros">
+                        <thead>
+                            <tr>
+                                <th>Título</th>
+                                <th>Precio de compra</th>
+                                <th>Fecha de lanzamiento</th>
+                                <th>Género</th>
+                                <th>Editorial</th>
+                                <th>Comprar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var libro in libros)
+                            {
+                                <tr id="LibroData_@libro.Titulo">
+                                    <td>@libro.Titulo</td>
+                                    <td>@libro.PrecioCompra.ToString("0.00") €</td>
+                                    <td>@libro.FechaLanzamiento.DateTime.ToShortDateString()</td>
+                                    <td>@libro.Genero</td>
+                                    <td>@libro.Editorial</td>
+                                    <td>
+                                        <button class="btn btn-outline-secondary" id="libroToBuy_@libro.Titulo" @onclick="@(() => AddLibro(libro))">Añadir</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+
+        @if (showCompraCart)
+        {
+            <div class="col-md-3">
+                <div class="d-grid gap-2">
+                    <h4>Carrito de compra</h4>
+                    @foreach (CompraItemDTO item in compra.CompraItems)
+                    {
+                        <button type="button" class="btn btn-outline-secondary" id="LibroSelected_@item.Titulo" @onclick="@(() => RemoveCompraItem(item))">
+                            @item.Titulo (@item.PrecioCompra.ToString("0.00") €)
+                        </button>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+</div>
+
+@code {
+
+    private ICollection<LibroParaComprarDTO> libros { get; set; } = new List<LibroParaComprarDTO>();
+
+    // Filtros (el género es un campo de texto)
+    private string? libroGenero;
+    private double? libroPrecio;
+
+    private string messageError = string.Empty;
+    private bool showCompraCart = false;
+
+    private CompraForCreateDTO compra => compraState.Compra;
+    private bool comprarButtonDisabled => compra.CompraItems.Count == 0;
+
+    private void ToggleCompraCart()
+    {
+        showCompraCart = !showCompraCart;
+    }
+
+    private void AddLibro(LibroParaComprarDTO libro)
+    {
+        compraState.AddLibroToCompra(libro);
+    }
+
+    private void RemoveCompraItem(CompraItemDTO item)
+    {
+        compraState.RemoveCompraItem(item);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await SearchLibros();
+    }
+
+    protected async Task SearchLibros()
+    {
+        messageError = string.Empty;
+
+        if (libroPrecio.HasValue && libroPrecio.Value < 0)
+        {
+            messageError = "El precio máximo no puede ser negativo";
+            return;
+        }
+
+        // Si el campo de género está vacío no se filtra por género
+        string? genero = string.IsNullOrWhiteSpace(libroGenero) ? null : libroGenero.Trim();
+
+        try
+        {
+            libros = await apiservice.GetLibrosParaComprarAsync(genero, libroPrecio);
+        }
+        catch (ApiException ex)
+        {
+            libros = new List<LibroParaComprarDTO>();
+            logger.LogError(ex, "Error! There was an error while connecting to the GetLibrosParaComprarAsync service");
+        }
+        catch (HttpRequestException ex)
+        {
+            libros = new List<LibroParaComprarDTO>();
+            messageError = "No se ha podido conectar con la API";
+            logger.LogError(ex, "Error! The API is not reachable");
+        }
+
+        StateHasChanged();
+    }
+
+    private void ComprarLibros()
+    {
+        navigation.NavigateTo("/compras/createcompra");
+    }
+}

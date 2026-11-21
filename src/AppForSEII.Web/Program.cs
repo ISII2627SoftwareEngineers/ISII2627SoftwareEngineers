@@ -80,6 +80,8 @@ builder.Services.AddScoped<AppForSEIIAPIClient>(sp =>new AppForSEIIAPIClient(URI
 
 builder.Services.AddScoped<ResenaStateContainer>();
 
+builder.Services.AddScoped<CompraStateContainer>();//Registrar el contenedor
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -52,5 +52,13 @@ namespace AppForSEII.Web
             Compra.PrecioTotal = Compra.CompraItems
                 .Sum(ci => ci.PrecioCompra * (ci.Cantidad > 0 ? ci.Cantidad : 1));
         }
+        // Se llama cuando la compra ya se ha creado en la API: empieza un carrito nuevo y vacío
+        public void CompraProcessed()
+        {
+                Compra = new CompraForCreateDTO()
+            {
+                CompraItems = new List<CompraItemDTO>()
+            };
+        }
     }
 }

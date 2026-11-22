@@ -162,9 +162,23 @@ namespace AppForSEII.UT.ReposicionesController_test
             // Assert
             var createdResult = Assert.IsType<CreatedAtActionResult>(result);
             
-            Assert.Equal("GetReposicionDetails", createdResult.ActionName);
-            Assert.True(createdResult.RouteValues!.ContainsKey("id"));
-            Assert.Null(createdResult.Value);
+             var reposicionActual = Assert.IsType<ReposicionDetailsDTO>(createdResult.Value);
+
+            // DTO esperado: id 1, precio total 10.0m * 10 = 100.0m y método de pago "Visa".
+            // La fecha la genera el controlador con DateTime.UtcNow, por lo que se toma la real para comparar el resto.
+            var expectedReposicion = new ReposicionDetailsDTO(
+                1,
+                reposicionActual.FechaReposicion,
+                100.0m,
+                _customerName,
+                _customerSurname,
+                _phone,
+                "Visa",
+                new List<ReposicionItemDTO> { new ReposicionItemDTO(1, _libroTitulo, "Brandon Sanderson", 10) }
+            );
+
+            // Comprobamos que el DTO esperado y el real son iguales (usa el Equals con SequenceEqual del DTO)
+            Assert.Equal(expectedReposicion, reposicionActual);
         }
     }
 }

@@ -1,0 +1,79 @@
+@page "/resenas/detailresena"
+@using AppForSEII.Web.API
+@inject AppForSEIIAPIClient apiservice
+
+<h3>Detalles de la Reseña</h3>
+
+@if (resena == null)
+{
+    <p>@error</p>
+}
+else
+{
+    <table class="table table-borderless table-sm">
+        <tr>
+            <th>Nombre y Apellidos</th>
+            <td id="NombreApellidos">@resena.Nombre @resena.Apellidos</td>
+        </tr>
+        <tr>
+            <th>Teléfono</th>
+            <td id="Telefono">@resena.Telefono</td>
+        </tr>
+        <tr>
+            <th>Fecha de Reseña</th>
+            <td id="FechaResena">@resena.FechaResena.ToString("dd/MM/yyyy HH:mm:ss")</td>
+        </tr>
+    </table>
+
+    <h4>Libros Reseñados</h4>
+
+    <table class="table" id="LibrosResenados">
+        <thead>
+            <tr>
+                <th scope="col">Título</th>
+                <th scope="col">Editorial</th>
+                <th scope="col">Tipo de Libro</th>
+                <th scope="col">Calificación</th>
+                <th scope="col">Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (ResenaItemDTO item in resena.ResenaItems)
+            {
+                <tr id="ResenaItem_@item.Titulo">
+                    <td>@item.Titulo</td>
+                    <td>@item.Editorial</td>
+                    <td>@item.TipoLibro</td>
+                    <td>@item.Calificacion / 5</td>
+                    <td>@item.Descripcion</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int ResenaID { get; set; }
+
+    private ResenaDetailDTO? resena;
+    private string error = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            resena = await apiservice.GetDetailsForResenasAsync(ResenaID);
+        }
+        catch (ApiException)
+        {
+            resena = null;
+        }
+
+        if (resena == null)
+        {
+            error = $"¡Error! No existe ninguna reseña con id={ResenaID}";
+        }
+    }
+}

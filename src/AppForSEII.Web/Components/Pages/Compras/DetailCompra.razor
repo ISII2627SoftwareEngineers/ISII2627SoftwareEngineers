@@ -1,0 +1,113 @@
+@page "/compras/detailcompra"
+@using AppForSEII.Web.API
+@using Microsoft.AspNetCore.Authorization
+
+@inject AppForSEIIAPIClient apiservice
+@inject ILogger<DetailCompra> logger
+
+@attribute [Authorize]
+
+<PageTitle>Detalles de la compra</PageTitle>
+
+<h3>Detalles de la compra</h3>
+
+@if (compra == null)
+{
+    <div class="alert alert-danger" role="alert" id="MessageError">
+        @error
+    </div>
+}
+else
+{
+    @* Datos del cliente y de la compra (paso 7 del flujo básico) *@
+    <table class="table table-borderless table-sm">
+        <tr>
+            <th>Nombre y apellidos</th>
+            <td id="NombreApellidos">@compra.Nombre @compra.Apellidos</td>
+        </tr>
+        <tr>
+            <th>Dirección</th>
+            <td id="Direccion">@compra.Direccion</td>
+        </tr>
+        <tr>
+            <th>Teléfono</th>
+            <td id="Telefono">@compra.Telefono</td>
+        </tr>
+        <tr>
+            <th>Fecha de la compra</th>
+            <td id="FechaCompra">@compra.Fecha.ToString("dd/MM/yyyy HH:mm:ss")</td>
+        </tr>
+        <tr>
+            <th>Método de pago</th>
+            <td id="MetodoPago">@compra.MetodoPago</td>
+        </tr>
+        @* El código de descuento es opcional: solo se muestra si existe *@
+        @if (!string.IsNullOrEmpty(compra.CodigoDescuento))
+        {
+            <tr>
+                <th>Código de descuento</th>
+                <td id="CodigoDescuento">@compra.CodigoDescuento</td>
+            </tr>
+        }
+        <tr>
+            <th>Precio total</th>
+            <td id="PrecioTotal">@compra.PrecioTotal.ToString("0.00") €</td>
+        </tr>
+    </table>
+
+    @* Libros comprados (título, género y editorial) *@
+    <h4>Libros comprados</h4>
+
+    <table class="table" id="LibrosComprados">
+        <thead>
+            <tr>
+                <th scope="col">Título</th>
+                <th scope="col">Género</th>
+                <th scope="col">Editorial</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (CompraItemDTO item in compra.CompraItems)
+            {
+                <tr id="CompraItem_@item.Titulo">
+                    <td>@item.Titulo</td>
+                    <td>@item.Genero</td>
+                    <td>@item.Editorial</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    // Se recibe por query string: /compras/detailcompra?CompraID=5
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int CompraID { get; set; }
+
+    private CompraDetailDTO? compra;
+    private string error = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            compra = await apiservice.GetDetailsForComprasAsync(CompraID);
+        }
+        catch (ApiException ex)
+        {
+            compra = null;
+            // 404: la compra no existe. Cualquier otro código indica un fallo de la API (500) o de lectura de la respuesta
+            error = ex.StatusCode == 404
+                ? $"¡Error! No existe ninguna compra con id={CompraID}"
+                : $"¡Error {ex.StatusCode}! No se ha podido obtener la compra con id={CompraID}";
+            logger.LogError(ex, "Error while calling GetDetailsForComprasAsync");
+        }
+        catch (HttpRequestException ex)
+        {
+            compra = null;
+            error = "No se ha podido conectar con la API";
+            logger.LogError(ex, "The API is not reachable");
+        }
+    }
+}
